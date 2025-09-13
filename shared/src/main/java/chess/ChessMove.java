@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Objects;
+
 /**
  * Represents moving a chess piece on a chessboard
  * <p>
@@ -46,5 +48,28 @@ public class ChessMove {
     @Override
     public String toString() {
         return String.format("%s%s", startPosition, endPosition);
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        if (that == null || getClass() != that.getClass()) {
+            return false;
+        }
+        if (promotionPiece == null ^ ((ChessMove) that).promotionPiece == null){
+            return false;
+        }
+        if (promotionPiece != null && ((ChessMove) that).promotionPiece != null){
+            if (promotionPiece != ((ChessMove) that).promotionPiece){
+                return false;
+            }
+        }
+        return startPosition.equals(((ChessMove) that).startPosition) && endPosition.equals(((ChessMove) that).endPosition);
+        // This code was passing by reference instead of value! The source of all my problems!
+        // return ((ChessMove) that).startPosition == startPosition && ((ChessMove) that).endPosition == endPosition && ((ChessMove) that).promotionPiece == promotionPiece;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startPosition, endPosition, promotionPiece);
     }
 }

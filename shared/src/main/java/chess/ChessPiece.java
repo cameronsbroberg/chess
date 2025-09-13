@@ -3,6 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -70,13 +71,13 @@ public class ChessPiece {
             col--;
             ChessPosition currentPosition = new ChessPosition(row,col);
             if(board.getPiece(currentPosition) == null){
-                validMoves.add(new ChessMove(myPosition,currentPosition,PieceType.BISHOP));
+                validMoves.add(new ChessMove(myPosition,currentPosition,null));
             }
             else if(board.getPiece(currentPosition).getTeamColor() == color){
                 break;
             }
             else if(board.getPiece(currentPosition).getTeamColor() != color){
-                validMoves.add(new ChessMove(myPosition,currentPosition,PieceType.BISHOP)); //FIXME don't have your queens turn into bishops
+                validMoves.add(new ChessMove(myPosition,currentPosition,null));
                 break;
             }
         }
@@ -87,13 +88,13 @@ public class ChessPiece {
             col++;
             ChessPosition currentPosition = new ChessPosition(row,col);
             if(board.getPiece(currentPosition) == null){
-                validMoves.add(new ChessMove(myPosition,currentPosition,PieceType.BISHOP));
+                validMoves.add(new ChessMove(myPosition,currentPosition,null));
             }
             else if(board.getPiece(currentPosition).getTeamColor() == color){
                 break;
             }
             else if(board.getPiece(currentPosition).getTeamColor() != color){
-                validMoves.add(new ChessMove(myPosition,currentPosition,PieceType.BISHOP)); //FIXME don't have your queens turn into bishops
+                validMoves.add(new ChessMove(myPosition,currentPosition,null));
                 break;
             }
         }
@@ -104,13 +105,13 @@ public class ChessPiece {
             col++;
             ChessPosition currentPosition = new ChessPosition(row,col);
             if(board.getPiece(currentPosition) == null){
-                validMoves.add(new ChessMove(myPosition,currentPosition,PieceType.BISHOP));
+                validMoves.add(new ChessMove(myPosition,currentPosition,null));
             }
             else if(board.getPiece(currentPosition).getTeamColor() == color){
                 break;
             }
             else if(board.getPiece(currentPosition).getTeamColor() != color){
-                validMoves.add(new ChessMove(myPosition,currentPosition,PieceType.BISHOP)); //FIXME don't have your queens turn into bishops
+                validMoves.add(new ChessMove(myPosition,currentPosition,null));
                 break;
             }
         }
@@ -121,16 +122,30 @@ public class ChessPiece {
             col--;
             ChessPosition currentPosition = new ChessPosition(row,col);
             if(board.getPiece(currentPosition) == null){
-                validMoves.add(new ChessMove(myPosition,currentPosition,PieceType.BISHOP));
+                validMoves.add(new ChessMove(myPosition,currentPosition,null));
             }
             else if(board.getPiece(currentPosition).getTeamColor() == color){
                 break;
             }
             else if(board.getPiece(currentPosition).getTeamColor() != color){
-                validMoves.add(new ChessMove(myPosition,currentPosition,PieceType.BISHOP)); //FIXME don't have your queens turn into bishops
+                validMoves.add(new ChessMove(myPosition,currentPosition,null));
                 break;
             }
         }
         return validMoves;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor.equals(that.pieceColor) && type.equals(that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
     }
 }
