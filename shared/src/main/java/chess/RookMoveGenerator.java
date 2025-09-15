@@ -12,7 +12,6 @@ public class RookMoveGenerator {
     public RookMoveGenerator(ChessBoard board, ChessPosition startingPosition) {
         this.board = board;
         this.startingPosition = startingPosition;
-        this.validMoves = validMoves;
         this.color = board.getPiece(startingPosition).getTeamColor();
     }
 

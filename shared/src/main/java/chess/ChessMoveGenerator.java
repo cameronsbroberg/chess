@@ -18,6 +18,10 @@ public class ChessMoveGenerator {
             queenMoves.addAll(rookMoves);
             return queenMoves;
         }
+        if (board.getPiece(myPosition).getPieceType() == ChessPiece.PieceType.KNIGHT){
+            return new KnightMoveGenerator(board, myPosition).getMoves();
+        }
+
         return null;
     }
 }
