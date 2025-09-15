@@ -21,6 +21,9 @@ public class ChessMoveGenerator {
         if (board.getPiece(myPosition).getPieceType() == ChessPiece.PieceType.KNIGHT){
             return new KnightMoveGenerator(board, myPosition).getMoves();
         }
+        if (board.getPiece(myPosition).getPieceType() == ChessPiece.PieceType.KING){
+            return new KingMoveGenerator(board, myPosition).getMoves();
+        }
 
         return null;
     }
