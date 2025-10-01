@@ -5,9 +5,13 @@ import java.util.Collection;
 public class ChessGame {
     private TeamColor teamTurn;
     private ChessBoard board;
+    private ChessPosition whiteKingPosition;
+    private ChessPosition blackKingPosition;
     public ChessGame() {
         this.board = new ChessBoard();
         this.teamTurn = TeamColor.WHITE;
+        this.whiteKingPosition = new ChessPosition(1,5);
+        this.blackKingPosition = new ChessPosition(8,5);
     }
 
     /**

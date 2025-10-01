@@ -3,13 +3,11 @@ package chess;
 import java.util.Objects;
 
 public class ChessMove {
+    private ChessPosition startPosition;
+    private ChessPosition endPosition;
+    private ChessPiece.PieceType promotionPiece;
 
-    private final ChessPosition startPosition;
-    private final ChessPosition endPosition;
-    private final ChessPiece.PieceType promotionPiece;
-
-    public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
-                     ChessPiece.PieceType promotionPiece) {
+    public ChessMove(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece) {
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         this.promotionPiece = promotionPiece;
@@ -28,25 +26,19 @@ public class ChessMove {
     }
 
     @Override
-    public String toString() {
-        return String.format("%s%s", startPosition, endPosition);
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessMove chessMove = (ChessMove) o;
+        if(promotionPiece == null && ((ChessMove) o).promotionPiece == null){
+            return startPosition.equals(((ChessMove) o).startPosition) && endPosition.equals(((ChessMove) o).endPosition);
+        }
+        if(promotionPiece == null ^ ((ChessMove) o).promotionPiece == null){
+            return false;
+        }
+        return startPosition.equals(((ChessMove) o).startPosition) && endPosition.equals(((ChessMove) o).endPosition) && promotionPiece.equals(((ChessMove) o).promotionPiece);
     }
-
-    @Override
-    public boolean equals(Object that) {
-        if (that == null || getClass() != that.getClass()) {
-            return false;
-        }
-        if (promotionPiece == null ^ ((ChessMove) that).promotionPiece == null){
-            return false;
-        }
-        if (promotionPiece != null && ((ChessMove) that).promotionPiece != null){
-            if (promotionPiece != ((ChessMove) that).promotionPiece){
-                return false;
-            }
-        }
-        return startPosition.equals(((ChessMove) that).startPosition) && endPosition.equals(((ChessMove) that).endPosition);
-     }
 
     @Override
     public int hashCode() {

@@ -1,87 +1,67 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
-public class PawnMoveGenerator {
-    private final ChessBoard board;
-    private final ChessPosition startingPosition;
-    private Collection<ChessMove> validMoves = new ArrayList<>();
-    private final ChessGame.TeamColor color;
-    private final int row;
-    private final int col;
-
-    public PawnMoveGenerator(ChessBoard board, ChessPosition startingPosition) {
-        this.board = board;
-        this.startingPosition = startingPosition;
-        this.color = board.getPiece(startingPosition).getTeamColor();
-        this.row = startingPosition.getRow();
-        this.col = startingPosition.getColumn();
+public class PawnMoveGenerator extends MoveGenerator{
+    public PawnMoveGenerator(ChessBoard board, ChessPiece piece, ChessPosition startingPosition) {
+        super(board, piece, startingPosition);
     }
-    public Collection<ChessMove> getMoves(){
-        checkAdvances();
-        checkCaptures();
-        return validMoves;
-    }
-    private void checkPromotions(int target_row,int target_col){
-        if(target_row == 8 || target_row == 1){//there should never be a case of a white pawn moving to row 1 or a black pawn moving to row 8, so this should be okay.
-            validMoves.add(new ChessMove(startingPosition,new ChessPosition(target_row,target_col), ChessPiece.PieceType.QUEEN));
-            validMoves.add(new ChessMove(startingPosition,new ChessPosition(target_row,target_col), ChessPiece.PieceType.ROOK));
-            validMoves.add(new ChessMove(startingPosition,new ChessPosition(target_row,target_col), ChessPiece.PieceType.KNIGHT));
-            validMoves.add(new ChessMove(startingPosition,new ChessPosition(target_row,target_col), ChessPiece.PieceType.BISHOP));
+    private void promote(ChessPosition targetPosition){
+        if(targetPosition.getRow() == 1 || targetPosition.getRow() == 8){
+            ChessPiece.PieceType[] promotions = new ChessPiece.PieceType[]{
+                    ChessPiece.PieceType.KNIGHT,
+                    ChessPiece.PieceType.ROOK,
+                    ChessPiece.PieceType.BISHOP,
+                    ChessPiece.PieceType.QUEEN};
+            for(ChessPiece.PieceType promotion : promotions){
+                validMoves.add(new ChessMove(startingPosition,targetPosition,promotion));
+            }
         }
         else{
-            validMoves.add(new ChessMove(startingPosition,new ChessPosition(target_row,target_col),null));
+            validMoves.add(new ChessMove(startingPosition,targetPosition,null));
         }
     }
-    private void checkAdvances(){
-        int target_row;
-        if(color == ChessGame.TeamColor.WHITE) {
-            target_row = row + 1;
-            if (row == 2) {
-                if(board.getPiece(new ChessPosition(target_row,col)) == null){
-                    if (board.getPiece(new ChessPosition(row + 2, col)) == null) {
-                        validMoves.add(new ChessMove(startingPosition, new ChessPosition(row + 2, col), null)); //you shouldn't ever be able to promote from the second row as white
-                    }
+    @Override
+    public Collection<ChessMove> getMoves() {
+        int row = startingPosition.getRow();
+        int col = startingPosition.getColumn();
+        int targRow = row + 1;
+        if(piece.getTeamColor() == ChessGame.TeamColor.BLACK){
+            targRow = row - 1;
+        }
+        int[] cols = {-1,1};
+        for(int colAdj : cols){
+            int targCol = col + colAdj;
+            if(targRow > 8 || targRow < 1 || targCol > 8 || targCol < 1){
+                continue;
+            }
+            else{
+                ChessPosition targetPosition = new ChessPosition(targRow, targCol);
+                if(board.getPiece(targetPosition) == null){
+                    continue;
+                }
+                else if(board.getPiece(targetPosition).getTeamColor() != piece.getTeamColor()){
+                    promote(targetPosition);
                 }
             }
         }
-        else {//BLACK
-            target_row = row - 1;
-            if (row == 7) {//check for double move
-                if(board.getPiece(new ChessPosition(target_row,col)) == null){
-                    if (board.getPiece(new ChessPosition(row - 2, col)) == null) {
-                        validMoves.add(new ChessMove(startingPosition, new ChessPosition(row - 2, col), null)); //you shouldn't ever be able to promote from the seventh row as black
-                    }
+        //Moves!
+        ChessPosition targetPosition = new ChessPosition(targRow, col);
+        if(board.getPiece(targetPosition) == null){
+            promote(targetPosition);
+            if(row == 2 && piece.getTeamColor() == ChessGame.TeamColor.WHITE){
+                ChessPosition doubleTargetPosition = new ChessPosition(row + 2, col);
+                if(board.getPiece(doubleTargetPosition) == null){
+                    validMoves.add(new ChessMove(startingPosition,doubleTargetPosition,null));
+                }
+            }
+            if(row == 7 && piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
+                ChessPosition doubleTargetPosition = new ChessPosition(row - 2, col);
+                if (board.getPiece(doubleTargetPosition) == null) {
+                    validMoves.add(new ChessMove(startingPosition, doubleTargetPosition, null));
                 }
             }
         }
-        if(board.getPiece(new ChessPosition(target_row, col)) == null){
-            checkPromotions(target_row, col);
-        }
+        return validMoves;
     }
-    private void checkCaptures(){
-        int target_row;
-        if(color == ChessGame.TeamColor.WHITE){
-            target_row = row + 1;
-        }
-        else{ //BLACK
-            target_row = row - 1;
-        }
-        if(col > 1){
-            if(board.getPiece(new ChessPosition(target_row, col - 1)) != null && board.getPiece(new ChessPosition(target_row, col - 1)).getTeamColor() != color){
-                checkPromotions(target_row,col - 1);
-            }
-        }
-        if(col < 8){
-            if(board.getPiece(new ChessPosition(target_row, col + 1)) != null && board.getPiece(new ChessPosition(target_row, col + 1)).getTeamColor() != color){
-                checkPromotions(target_row,col + 1);
-            }
-        }
-    }
-    //first: check the color. Then have different methods for white and black
-    //Then check for moves
-    //Then check for captures
-    //Then check for promotion
-    //Do I do a checkValidity? I think not.
 }

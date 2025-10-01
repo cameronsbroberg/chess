@@ -1,68 +1,36 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
-public class RookMoveGenerator {
-    private final ChessBoard board;
-    private final ChessPosition startingPosition;
-    private Collection<ChessMove> validMoves = new ArrayList<>();
-    private final ChessGame.TeamColor color;
-
-    public RookMoveGenerator(ChessBoard board, ChessPosition startingPosition) {
-        this.board = board;
-        this.startingPosition = startingPosition;
-        this.color = board.getPiece(startingPosition).getTeamColor();
+public class RookMoveGenerator extends MoveGenerator{
+    public RookMoveGenerator(ChessBoard board, ChessPiece piece, ChessPosition startingPosition) {
+        super(board, piece, startingPosition);
     }
 
-    private boolean checkValidityAndContinue(chess.ChessPosition currentPosition){
-        if(board.getPiece(currentPosition) == null){
-            validMoves.add(new ChessMove(startingPosition,currentPosition,null));
-            return true;
-        }
-        else if(board.getPiece(currentPosition).getTeamColor() == color){
-            return false;
-        }
-        else if(board.getPiece(currentPosition).getTeamColor() != color) {
-            validMoves.add(new ChessMove(startingPosition, currentPosition, null));
-            return false;
-        }
-        return false; //theoretically unreachable
-    }
-
-    public Collection<ChessMove> getMoves(){
-        int row = startingPosition.getRow();
-        int col = startingPosition.getColumn();
-
-        while(row > 1) {//traverse down
-            row--;
-            ChessPosition currentPosition = new ChessPosition(row, col);
-            if (!checkValidityAndContinue(currentPosition)) {
-                break;
-            }
-        }
-        row = startingPosition.getRow();
-        while(row <8 ) {//awww it's a heart! traverse up
-            row++;
-            ChessPosition currentPosition = new ChessPosition(row, col);
-            if (!checkValidityAndContinue(currentPosition)) {
-                break;
-            }
-        }
-        row = startingPosition.getRow();
-        while(col > 1) {//traverse left
-            col--;
-            ChessPosition currentPosition = new ChessPosition(row, col);
-            if (!checkValidityAndContinue(currentPosition)) {
-                break;
-            }
-        }
-        col = startingPosition.getColumn();
-        while(col < 8) {//traverse right
-            col++;
-            ChessPosition currentPosition = new ChessPosition(row, col);
-            if (!checkValidityAndContinue(currentPosition)) {
-                break;
+    @Override
+    public Collection<ChessMove> getMoves() {
+        int[][] directions = {{1,0},{-1,0},{0,1},{0,-1}};
+        for(int[] dir : directions){
+            int row = startingPosition.getRow();
+            int col = startingPosition.getColumn();
+            while(true){
+                row = row + dir[0];
+                col = col + dir[1];
+                if(row > 8 || row < 1 || col > 8 || col < 1){
+                    break;
+                }
+                ChessPosition targetPosition = new ChessPosition(row,col);
+                if(board.getPiece(targetPosition) == null){
+                    validMoves.add(new ChessMove(startingPosition,targetPosition,null));
+                    continue;
+                }
+                if(board.getPiece(targetPosition).getTeamColor() != piece.getTeamColor()){
+                    validMoves.add(new ChessMove(startingPosition,targetPosition,null));
+                    break;
+                }
+                else{
+                    break;
+                }
             }
         }
         return validMoves;
