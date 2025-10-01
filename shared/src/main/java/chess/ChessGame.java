@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class ChessGame {
@@ -9,6 +10,7 @@ public class ChessGame {
     private ChessPosition blackKingPosition;
     public ChessGame() {
         this.board = new ChessBoard();
+        this.board.resetBoard();
         this.teamTurn = TeamColor.WHITE;
         this.whiteKingPosition = new ChessPosition(1,5);
         this.blackKingPosition = new ChessPosition(8,5);
@@ -19,7 +21,7 @@ public class ChessGame {
     }
 
     public void setTeamTurn(TeamColor team) {
-        this.teamTurn = teamTurn;
+        this.teamTurn = team;
     }
 
     /**
@@ -43,13 +45,20 @@ public class ChessGame {
             return null;
         }
         Collection<ChessMove> proposedMoves = piece.pieceMoves(board,startPosition);
+        Collection<ChessMove> legalMoves = new ArrayList<>();
         for(ChessMove move : proposedMoves){
             ChessPosition endPosition = move.getEndPosition();
-            ChessBoard boardAfterMove = board;
-//            boardAfterMove.addPiece();
+            ChessPiece targetPiece = board.getPiece(endPosition);
+            executeMove(move);
+            if(!isInCheck(piece.getTeamColor())){
+                legalMoves.add(move);
+            }
+            //Undo the move:
+            ChessMove reverseMove = new ChessMove(endPosition,startPosition,piece.getPieceType());
+            executeMove(reverseMove);
+            board.addPiece(endPosition,targetPiece);
         }
-        //FIXME remove illegal moves
-        return proposedMoves;
+        return legalMoves;
     }
 
     /**
@@ -95,9 +104,9 @@ public class ChessGame {
             }
         }
         if(teamTurn == TeamColor.WHITE){
-            teamTurn = TeamColor.BLACK;
+            setTeamTurn(TeamColor.BLACK);
         } else{
-            teamTurn = TeamColor.WHITE;
+            setTeamTurn(TeamColor.WHITE);
         }
     }
 
@@ -111,7 +120,7 @@ public class ChessGame {
         ChessPosition myKingPosition = whiteKingPosition;
         if(teamColor == TeamColor.BLACK){
             myKingPosition = blackKingPosition;
-        }
+        } //FIXME This probably might work lol
         for(int i = 1; i <= 8; i++){
             for(int j = 1; j <= 8; j++){
                 ChessPosition spaceToCheck = new ChessPosition(i,j);
@@ -130,7 +139,6 @@ public class ChessGame {
             }
         }
         return false;
-//        throw new RuntimeException("Not implemented");
     }
 
     /**
