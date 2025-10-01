@@ -56,83 +56,8 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
-//        if (piece.getPieceType() == PieceType.BISHOP) {
-//            return getBishopMoves(board,myPosition,piece.pieceColor);
-//        }
         return new ChessMoveGenerator().generatePieceMoves(board,myPosition);
     }
-//    private Collection<ChessMove> getBishopMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor color){
-//        Collection<ChessMove> validMoves = new ArrayList<>();
-//        int row = myPosition.getRow();
-//        int col = myPosition.getColumn();
-//        while(row > 1 & col > 1){ //Will traverse towards the bottom left. FIXME check the edge cases
-//            row--;
-//            col--;
-//            ChessPosition currentPosition = new ChessPosition(row,col);
-//            if(board.getPiece(currentPosition) == null){
-//                validMoves.add(new ChessMove(myPosition,currentPosition,null));
-//            }
-//            else if(board.getPiece(currentPosition).getTeamColor() == color){
-//                break;
-//            }
-//            else if(board.getPiece(currentPosition).getTeamColor() != color){
-//                validMoves.add(new ChessMove(myPosition,currentPosition,null));
-//                break;
-//            }
-//        }
-//        row = myPosition.getRow();
-//        col = myPosition.getColumn();
-//        while(row < 8 & col < 8){ //Will traverse towards the upper right.
-//            row++;
-//            col++;
-//            ChessPosition currentPosition = new ChessPosition(row,col);
-//            if(board.getPiece(currentPosition) == null){
-//                validMoves.add(new ChessMove(myPosition,currentPosition,null));
-//            }
-//            else if(board.getPiece(currentPosition).getTeamColor() == color){
-//                break;
-//            }
-//            else if(board.getPiece(currentPosition).getTeamColor() != color){
-//                validMoves.add(new ChessMove(myPosition,currentPosition,null));
-//                break;
-//            }
-//        }
-//        row = myPosition.getRow();
-//        col = myPosition.getColumn();
-//        while(row > 1 & col < 8){ //will traverse towards lower right
-//            row--;
-//            col++;
-//            ChessPosition currentPosition = new ChessPosition(row,col);
-//            if(board.getPiece(currentPosition) == null){
-//                validMoves.add(new ChessMove(myPosition,currentPosition,null));
-//            }
-//            else if(board.getPiece(currentPosition).getTeamColor() == color){
-//                break;
-//            }
-//            else if(board.getPiece(currentPosition).getTeamColor() != color){
-//                validMoves.add(new ChessMove(myPosition,currentPosition,null));
-//                break;
-//            }
-//        }
-//        row = myPosition.getRow();
-//        col = myPosition.getColumn();
-//        while(row < 8 & col > 1){ // will traverse towards upper left
-//            row++;
-//            col--;
-//            ChessPosition currentPosition = new ChessPosition(row,col);
-//            if(board.getPiece(currentPosition) == null){
-//                validMoves.add(new ChessMove(myPosition,currentPosition,null));
-//            }
-//            else if(board.getPiece(currentPosition).getTeamColor() == color){
-//                break;
-//            }
-//            else if(board.getPiece(currentPosition).getTeamColor() != color){
-//                validMoves.add(new ChessMove(myPosition,currentPosition,null));
-//                break;
-//            }
-//        }
-//        return validMoves;
-//    }
 
     @Override
     public boolean equals(Object o) {
