@@ -6,14 +6,10 @@ import java.util.Collection;
 public class ChessGame {
     private TeamColor teamTurn;
     private ChessBoard board;
-    private ChessPosition whiteKingPosition;
-    private ChessPosition blackKingPosition;
     public ChessGame() {
         setBoard(new ChessBoard());
         this.board.resetBoard();
         this.teamTurn = TeamColor.WHITE;
-        setWhiteKingPosition(new ChessPosition(1,5));
-        setBlackKingPosition(new ChessPosition(8,5));
     }
 
     public TeamColor getTeamTurn() {
@@ -46,8 +42,6 @@ public class ChessGame {
         }
         Collection<ChessMove> proposedMoves = piece.pieceMoves(board,startPosition);
         Collection<ChessMove> legalMoves = new ArrayList<>();
-        ChessPosition initialWhiteKingPosition = new ChessPosition(getWhiteKingPosition().getRow(),getWhiteKingPosition().getColumn());
-        ChessPosition initialBlackKingPosition = new ChessPosition(getBlackKingPosition().getRow(), getBlackKingPosition().getColumn());
         Collection<ChessMove> illegalMoves = new ArrayList<>();
         for(ChessMove move : proposedMoves){
             ChessPosition endPosition = move.getEndPosition();
@@ -62,8 +56,6 @@ public class ChessGame {
             //Undo the move:
             board.addPiece(startPosition,piece);
             board.addPiece(endPosition,targetPiece);
-            setWhiteKingPosition(initialWhiteKingPosition);
-            setBlackKingPosition(initialBlackKingPosition);
         }
         return legalMoves;
     }
@@ -94,7 +86,7 @@ public class ChessGame {
             setTeamTurn(TeamColor.WHITE);
         }
     }
-    private void executeMove(ChessMove move){
+    public void executeMove(ChessMove move){
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
         ChessPiece piece = board.getPiece(startPosition);
@@ -106,15 +98,6 @@ public class ChessGame {
             ChessPiece promotedPiece = new ChessPiece(piece.getTeamColor(),move.getPromotionPiece());
             board.addPiece(endPosition,promotedPiece);
         }
-        if(piece.getPieceType() == ChessPiece.PieceType.KING){
-            if(piece.getTeamColor() == TeamColor.WHITE){
-                setWhiteKingPosition(endPosition);
-            }
-            else{
-                setBlackKingPosition(endPosition);
-            }
-        }
-
     }
 
     /**
@@ -124,13 +107,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        ChessPosition myKingPosition;
-        if(teamColor == TeamColor.BLACK){
-            myKingPosition = getBlackKingPosition();
-        }
-        else{
-            myKingPosition = getWhiteKingPosition();
-        }
+        ChessPosition myKingPosition = getKingPosition(teamColor);
         for(int i = 1; i <= 8; i++){
             for(int j = 1; j <= 8; j++){
                 ChessPosition spaceToCheck = new ChessPosition(i,j);
@@ -180,19 +157,22 @@ public class ChessGame {
         return this.board;
     }
 
-    public ChessPosition getWhiteKingPosition() {
-        return whiteKingPosition;
+    public ChessPosition getKingPosition(TeamColor teamColor) {
+        for(int i = 1; i <= 8; i++){
+            for(int j = 1; j <= 8; j++) {
+                ChessPosition currentPosition = new ChessPosition(i,j);
+                ChessPiece piece = board.getPiece(currentPosition);
+                if(piece == null){
+                    continue;
+                }
+                if(piece.getPieceType() == ChessPiece.PieceType.KING){
+                    if(piece.getTeamColor() == teamColor){
+                        return(currentPosition);
+                    }
+                }
+            }
+        }
+        throw new RuntimeException("King not found when checking for check");
     }
 
-    public void setWhiteKingPosition(ChessPosition whiteKingPosition) {
-        this.whiteKingPosition = whiteKingPosition;
-    }
-
-    public ChessPosition getBlackKingPosition() {
-        return blackKingPosition;
-    }
-
-    public void setBlackKingPosition(ChessPosition blackKingPosition) {
-        this.blackKingPosition = blackKingPosition;
-    }
 }
