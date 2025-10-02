@@ -68,4 +68,55 @@ public class ChessPiece {
     public int hashCode() {
         return Objects.hash(pieceColor, type);
     }
+
+    @Override
+    public String toString() {
+        switch(this.getTeamColor()){
+            case WHITE -> {
+                switch(this.getPieceType()){
+                    case KING -> {
+                        return " K  ";
+                    }
+                    case QUEEN -> {
+                        return " Q  ";
+                    }
+                    case BISHOP -> {
+                        return " B  ";
+                    }
+                    case KNIGHT -> {
+                        return " N  ";
+                    }
+                    case ROOK -> {
+                        return " R  ";
+                    }
+                    case PAWN -> {
+                        return " P  ";
+                    }
+                }
+            }
+            case BLACK -> {
+                switch(this.getPieceType()){
+                    case KING -> {
+                        return " k  ";
+                    }
+                    case QUEEN -> {
+                        return " q  ";
+                    }
+                    case BISHOP -> {
+                        return " b  ";
+                    }
+                    case KNIGHT -> {
+                        return " n  ";
+                    }
+                    case ROOK -> {
+                        return " r  ";
+                    }
+                    case PAWN -> {
+                        return " p  ";
+                    }
+                }
+            }
+        }
+        return "NO PIECE TYPE";
+    }
 }

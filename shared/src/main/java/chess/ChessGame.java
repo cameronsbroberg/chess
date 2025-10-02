@@ -9,11 +9,11 @@ public class ChessGame {
     private ChessPosition whiteKingPosition;
     private ChessPosition blackKingPosition;
     public ChessGame() {
-        this.board = new ChessBoard();
+        setBoard(new ChessBoard());
         this.board.resetBoard();
         this.teamTurn = TeamColor.WHITE;
-        this.whiteKingPosition = new ChessPosition(1,5);
-        this.blackKingPosition = new ChessPosition(8,5);
+        setWhiteKingPosition(new ChessPosition(1,5));
+        setBlackKingPosition(new ChessPosition(8,5));
     }
 
     public TeamColor getTeamTurn() {
@@ -46,17 +46,24 @@ public class ChessGame {
         }
         Collection<ChessMove> proposedMoves = piece.pieceMoves(board,startPosition);
         Collection<ChessMove> legalMoves = new ArrayList<>();
+        ChessPosition initialWhiteKingPosition = new ChessPosition(getWhiteKingPosition().getRow(),getWhiteKingPosition().getColumn());
+        ChessPosition initialBlackKingPosition = new ChessPosition(getBlackKingPosition().getRow(), getBlackKingPosition().getColumn());
+        Collection<ChessMove> illegalMoves = new ArrayList<>();
         for(ChessMove move : proposedMoves){
             ChessPosition endPosition = move.getEndPosition();
             ChessPiece targetPiece = board.getPiece(endPosition);
             executeMove(move);
-            if(!isInCheck(piece.getTeamColor())){
+            if(!(isInCheck(piece.getTeamColor()))){
                 legalMoves.add(move);
             }
+            else{
+                illegalMoves.add(move);
+            }
             //Undo the move:
-            ChessMove reverseMove = new ChessMove(endPosition,startPosition,piece.getPieceType());
-            executeMove(reverseMove);
+            board.addPiece(startPosition,piece);
             board.addPiece(endPosition,targetPiece);
+            setWhiteKingPosition(initialWhiteKingPosition);
+            setBlackKingPosition(initialBlackKingPosition);
         }
         return legalMoves;
     }
@@ -69,7 +76,6 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition startPosition = move.getStartPosition();
-        ChessPosition endPosition = move.getEndPosition();
         ChessPiece piece = board.getPiece(startPosition);
         if(piece == null){
             throw new InvalidMoveException("No piece found at starting position");
@@ -77,17 +83,22 @@ public class ChessGame {
         if(piece.getTeamColor() != teamTurn){
             throw new InvalidMoveException("Not your turn");
         }
-        Collection<ChessMove> legalMoves = piece.pieceMoves(board,startPosition);
+        Collection<ChessMove> legalMoves = validMoves(startPosition);
         if(!legalMoves.contains(move)){
             throw new InvalidMoveException("Not a legal move");
         }
-        executeMove(move); //makeMove checks legality, executeMove carries it out.
+        executeMove(move);//makeMove checks legality, executeMove carries it out.
+        if(teamTurn == TeamColor.WHITE){
+            setTeamTurn(TeamColor.BLACK);
+        } else{
+            setTeamTurn(TeamColor.WHITE);
+        }
     }
     private void executeMove(ChessMove move){
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
         ChessPiece piece = board.getPiece(startPosition);
-        board.addPiece(startPosition,null); //Does this work?
+        board.addPiece(startPosition,null);
         if(move.getPromotionPiece() == null){
             board.addPiece(endPosition,piece);
         }
@@ -97,17 +108,13 @@ public class ChessGame {
         }
         if(piece.getPieceType() == ChessPiece.PieceType.KING){
             if(piece.getTeamColor() == TeamColor.WHITE){
-                whiteKingPosition = endPosition;
+                setWhiteKingPosition(endPosition);
             }
             else{
-                blackKingPosition = endPosition;
+                setBlackKingPosition(endPosition);
             }
         }
-        if(teamTurn == TeamColor.WHITE){
-            setTeamTurn(TeamColor.BLACK);
-        } else{
-            setTeamTurn(TeamColor.WHITE);
-        }
+
     }
 
     /**
@@ -117,10 +124,13 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        ChessPosition myKingPosition = whiteKingPosition;
+        ChessPosition myKingPosition;
         if(teamColor == TeamColor.BLACK){
-            myKingPosition = blackKingPosition;
-        } //FIXME This probably might work lol
+            myKingPosition = getBlackKingPosition();
+        }
+        else{
+            myKingPosition = getWhiteKingPosition();
+        }
         for(int i = 1; i <= 8; i++){
             for(int j = 1; j <= 8; j++){
                 ChessPosition spaceToCheck = new ChessPosition(i,j);
@@ -129,9 +139,9 @@ public class ChessGame {
                     continue;
                 }
                 if(piece.getTeamColor() != teamColor){
-                    Collection<ChessMove> moves = piece.pieceMoves(board,spaceToCheck);
-                    for (ChessMove move : moves){
-                        if(move.getEndPosition() == myKingPosition){
+                    Collection<ChessMove> enemyMoves = piece.pieceMoves(board,spaceToCheck);
+                    for (ChessMove enemyMove : enemyMoves){
+                        if(enemyMove.getEndPosition().equals(myKingPosition)){
                             return true;
                         }
                     }
@@ -168,5 +178,21 @@ public class ChessGame {
 
     public ChessBoard getBoard() {
         return this.board;
+    }
+
+    public ChessPosition getWhiteKingPosition() {
+        return whiteKingPosition;
+    }
+
+    public void setWhiteKingPosition(ChessPosition whiteKingPosition) {
+        this.whiteKingPosition = whiteKingPosition;
+    }
+
+    public ChessPosition getBlackKingPosition() {
+        return blackKingPosition;
+    }
+
+    public void setBlackKingPosition(ChessPosition blackKingPosition) {
+        this.blackKingPosition = blackKingPosition;
     }
 }
