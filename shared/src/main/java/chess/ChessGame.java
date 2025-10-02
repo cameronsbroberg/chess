@@ -120,30 +120,18 @@ public class ChessGame {
         }
         return legalMoves;
     }
-    /**
-     * Determines if the given team is in checkmate
-     *
-     * @param teamColor which team to check for checkmate
-     * @return True if the specified team is in checkmate
-     */
     public boolean isInCheckmate(TeamColor teamColor) {
         if(isInCheck(teamColor)){
-            if(getTeamMoves(teamColor).isEmpty()){
-                return true;
-            }
+            return getTeamMoves(teamColor).isEmpty();
         }
         return false;
     }
 
-    /**
-     * Determines if the given team is in stalemate, which here is defined as having
-     * no valid moves while not in check.
-     *
-     * @param teamColor which team to check for stalemate
-     * @return True if the specified team is in stalemate, otherwise false
-     */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if(!isInCheck(teamColor)){
+            return getTeamMoves(teamColor).isEmpty();
+        }
+        return false;
     }
 
     public void setBoard(ChessBoard board) {
