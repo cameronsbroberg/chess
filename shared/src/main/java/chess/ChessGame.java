@@ -21,14 +21,6 @@ public class ChessGame {
         WHITE,
         BLACK
     }
-
-    /**
-     * Gets a valid moves for a piece at the given location
-     *
-     * @param startPosition the piece to get valid moves for
-     * @return Set of valid moves for requested piece, or null if no piece at
-     * startPosition
-     */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
         if(piece == null){
@@ -48,8 +40,6 @@ public class ChessGame {
         }
         return legalMoves;
     }
-
-
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition startPosition = move.getStartPosition();
         ChessPiece piece = board.getPiece(startPosition);
@@ -126,22 +116,18 @@ public class ChessGame {
         }
         return false;
     }
-
     public boolean isInStalemate(TeamColor teamColor) {
         if(!isInCheck(teamColor)){
             return getTeamMoves(teamColor).isEmpty();
         }
         return false;
     }
-
     public void setBoard(ChessBoard board) {
         this.board = board;
     }
-
     public ChessBoard getBoard() {
         return this.board;
     }
-
     private ChessPosition getKingPosition(TeamColor teamColor) {
         for(int i = 1; i <= 8; i++){
             for(int j = 1; j <= 8; j++) {
@@ -159,5 +145,4 @@ public class ChessGame {
         }
         throw new RuntimeException("King not found when checking for check");
     }
-
 }
