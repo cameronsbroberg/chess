@@ -14,16 +14,26 @@ public class MemoryGameDAO implements GameDAO{
         return nextID++; //FIXME: make sure that this actually updates afterwards.
     }
 
-    public GameData getGame(int gameID) {
-        return games.get(gameID);
+    public GameData getGame(int gameID) throws DataAccessException{
+        if(games.containsKey(gameID)){
+            return games.get(gameID);
+        }
+        else{
+            throw new DataAccessException("Game not found");
+        }
     }
 
     public Collection<GameData> listGames() {
         return games.values();
     }
 
-    public void updateGame(int gameID, GameData gameData) {
-        games.replace(gameID, gameData); //FIXME: This could be simplified to not be copying a bunch of existing data.
+    public void updateGame(int gameID, GameData gameData) throws DataAccessException{
+        if(games.containsKey(gameID)){
+            games.replace(gameID, gameData);
+        }
+        else{
+            throw new DataAccessException("Game not found");
+        }
     }
 
     public void clear() {
