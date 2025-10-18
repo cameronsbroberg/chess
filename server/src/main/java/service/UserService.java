@@ -5,6 +5,7 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 import dataaccess.UserDAO;
+import requests.LoginRequest;
 
 public class UserService {
     private UserDAO userDAO = null;
@@ -17,12 +18,26 @@ public class UserService {
     public AuthData register(UserData registerRequest) {//I don't think I need a specific RegisterRequest class
         String username = registerRequest.username();
         try {
-            UserData userData = userDAO.getUser(username);
+            userDAO.getUser(username);
             throw new AlreadyTakenException("username already taken");
         } catch (DataAccessException e) {
-            //This is good, it means that the username isn't taken.
             userDAO.createUser(registerRequest);
             return authDAO.createAuth(registerRequest.username());
         }
+    }
+
+    public AuthData login(LoginRequest loginRequest) {
+        String username = loginRequest.username();
+        try {
+            UserData userData = userDAO.getUser(username);
+            if (!(loginRequest.password().equals(userData.password()))) {
+                throw new InvalidLoginException("Invalid password");
+            }
+            return authDAO.createAuth(username);
+        }
+        catch (DataAccessException e) {
+            throw new InvalidLoginException("Invalid username");
+        }
+
     }
 }
