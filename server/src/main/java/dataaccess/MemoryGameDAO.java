@@ -8,7 +8,7 @@ import java.util.List;
 
 public class MemoryGameDAO implements GameDAO{
     private int nextID = 1;
-    private HashMap<Integer, GameData> games = new HashMap<>();
+    private HashMap<Integer, GameData> games = new HashMap<>(); //FIXME The game data should be jsonified probably
     public int createGame(GameData gameData) {
         games.put(nextID, gameData);
         return nextID++; //FIXME: make sure that this actually updates afterwards.

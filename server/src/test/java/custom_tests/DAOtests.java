@@ -15,7 +15,7 @@ public class DAOtests {
     public void createAndAddAuth(){
         AuthData authData = new AuthData("genericToken","cambam");
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        authDAO.createAuth(authData);
+        authDAO.createAuth("cambam");
 
         AuthData foundAuth = Assertions.assertDoesNotThrow(() -> authDAO.getAuth("genericToken"));
         Assertions.assertEquals(authData, foundAuth);
@@ -28,7 +28,7 @@ public class DAOtests {
     public void addAndDeleteAuth(){
         AuthData authData = new AuthData("genericToken","cambam");
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        authDAO.createAuth(authData);
+        authDAO.createAuth("cambam");
 
         AuthData foundAuth = Assertions.assertDoesNotThrow(() -> authDAO.getAuth("genericToken"));
         Assertions.assertEquals(authData, foundAuth);
