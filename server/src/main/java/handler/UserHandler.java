@@ -5,6 +5,7 @@ import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import dataaccess.UserDAO;
 import dataaccess.AuthDAO;
+import io.javalin.http.Context;
 import model.AuthData;
 import model.UserData;
 import service.AlreadyTakenException;
@@ -12,11 +13,12 @@ import service.UserService;
 
 public class UserHandler {//Handlers handle jsons. They pass models to the service and get http requests from the Server.
     private Gson serializer = new Gson();
-    String registerRequest(String json){
+    public String register(Context ctx){
         UserDAO userDAO = new MemoryUserDAO();
         AuthDAO authDAO = new MemoryAuthDAO();
         UserService userService = new UserService(userDAO,authDAO);
 
+        String json = ctx.body(); //Sort of a shot in the dark
         UserData userData = serializer.fromJson(json, UserData.class);
         AuthData result = null;
         try {
