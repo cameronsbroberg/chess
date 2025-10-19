@@ -19,7 +19,7 @@ public class UserService {
         String username = registerRequest.username();
         try {
             userDAO.getUser(username);
-            throw new AlreadyTakenException("username already taken");
+            throw new AlreadyTakenException("Error: already taken");
         } catch (DataAccessException e) {
             userDAO.createUser(registerRequest);
             return authDAO.createAuth(registerRequest.username());

@@ -15,6 +15,7 @@ public class Server {
 //        javalin loginEndpoint = javalin.addEndpoint(.post("/user", new UserHandler().register(Context ctx)));
         UserHandler userHandler = new UserHandler();
         javalin.post("/user", userHandler::register);
+        javalin.post("/session", userHandler::login);
 
     }
 
