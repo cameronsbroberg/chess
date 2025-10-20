@@ -1,5 +1,6 @@
 package server;
 
+import dataaccess.*;
 import handler.UserHandler;
 import io.javalin.*;
 import io.javalin.http.Context;
@@ -12,10 +13,14 @@ public class Server {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
-//        javalin loginEndpoint = javalin.addEndpoint(.post("/user", new UserHandler().register(Context ctx)));
-        UserHandler userHandler = new UserHandler();
+        UserDAO userDAO = new MemoryUserDAO();
+        AuthDAO authDAO = new MemoryAuthDAO();
+        GameDAO gameDAO = new MemoryGameDAO();
+        UserHandler userHandler = new UserHandler(userDAO, authDAO);
         javalin.post("/user", userHandler::register);
         javalin.post("/session", userHandler::login);
+        javalin.delete("/session", userHandler::logout);
+
 
     }
 

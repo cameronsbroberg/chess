@@ -11,18 +11,15 @@ import model.UserData;
 import requests.LoginRequest;
 import service.AlreadyTakenException;
 import service.InvalidLoginException;
+import service.InvalidTokenException;
 import service.UserService;
 
 public class UserHandler {//Handlers handle jsons. They pass models to the service and get http requests from the Server.
-    private Gson serializer;
-    private UserDAO userDAO;
-    private AuthDAO authDAO;
-    private UserService userService;
+    final private Gson serializer;
+    final private UserService userService;
 
-    public UserHandler() {
+    public UserHandler(UserDAO userDAO, AuthDAO authDAO) {
         this.serializer = new Gson();
-        this.userDAO = new MemoryUserDAO();
-        this.authDAO = new MemoryAuthDAO();
         this.userService = new UserService(userDAO,authDAO);
     }
 
@@ -35,7 +32,6 @@ public class UserHandler {//Handlers handle jsons. They pass models to the servi
             ctx.status(200);
             ctx.result(serializer.toJson(result));
         } catch (AlreadyTakenException e) {
-//            String errorJson = String.format("{\"message\": \"%s\"}", e.getMessage());
             ctx.status(403);
             ctx.result(serializer.toJson(e.getMessage()));
         }
@@ -54,5 +50,17 @@ public class UserHandler {//Handlers handle jsons. They pass models to the servi
             ctx.result(serializer.toJson(e.getMessage()));
         }
 
+    }
+
+    public void logout(Context ctx){
+        String authToken = ctx.header("authorization");
+        try {
+            userService.logout(authToken);
+            ctx.status(200);
+            ctx.result("{}");
+        } catch (InvalidTokenException e) {
+            ctx.status(400);
+            ctx.result(serializer.toJson(e.getMessage()));
+        }
     }
 }

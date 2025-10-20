@@ -38,6 +38,13 @@ public class UserService {
         catch (DataAccessException e) {
             throw new InvalidLoginException("Invalid username");
         }
+    }
 
+    public void logout(String authToken) {
+        try {
+            authDAO.deleteAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new InvalidTokenException("Error: unauthorized");
+        }
     }
 }

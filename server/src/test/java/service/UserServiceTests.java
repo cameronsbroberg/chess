@@ -1,5 +1,7 @@
 package service;
 
+import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import model.AuthData;
@@ -60,4 +62,34 @@ public class UserServiceTests {
                 () -> userService.login(new LoginRequest("Alice","wrongpass123")));
         Assertions.assertEquals("Invalid password",e.getMessage());
     }
+
+    @Test
+    @DisplayName("Successfully logout a logged-in user")
+    public void logout(){
+        MemoryAuthDAO authDAO = new MemoryAuthDAO();
+        UserService userService = new UserService(new MemoryUserDAO(), authDAO);
+        UserData firstUser = new UserData("Alice","pass123","hello@byu.edu");
+        Assertions.assertDoesNotThrow(() -> userService.register(firstUser));
+        AuthData loginResult = Assertions.assertDoesNotThrow(() ->
+                userService.login(new LoginRequest(firstUser.username(), firstUser.password())));
+        Assertions.assertDoesNotThrow(() -> userService.logout(loginResult.authToken()));
+        Assertions.assertThrows(DataAccessException.class, () -> authDAO.getAuth(loginResult.authToken()));
+    }
+
+    @Test
+    @DisplayName("Unsuccessfully logout a fake authToken")
+    public void logout_bad_auth(){
+        UserService userService = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
+        Assertions.assertThrows(InvalidTokenException.class, () -> userService.logout("fakeAuthTokenString"));
+    }
+
+    @Test
+    @DisplayName("Unsuccessfully logout a user who is not logged in")
+    public void logout_offline_user(){
+        UserService userService = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
+        UserData firstUser = new UserData("Alice","pass123","hello@byu.edu");
+        Assertions.assertDoesNotThrow(() -> userService.register(firstUser));
+        Assertions.assertThrows(InvalidTokenException.class, () -> userService.logout("fakeAuthTokenString"));
+    }
+
 }
