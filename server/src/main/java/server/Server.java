@@ -1,6 +1,7 @@
 package server;
 
 import dataaccess.*;
+import handler.GameHandler;
 import handler.UserHandler;
 import io.javalin.*;
 import io.javalin.http.Context;
@@ -17,9 +18,11 @@ public class Server {
         AuthDAO authDAO = new MemoryAuthDAO();
         GameDAO gameDAO = new MemoryGameDAO();
         UserHandler userHandler = new UserHandler(userDAO, authDAO);
+        GameHandler gameHandler = new GameHandler(userDAO, authDAO, gameDAO);
         javalin.post("/user", userHandler::register);
         javalin.post("/session", userHandler::login);
         javalin.delete("/session", userHandler::logout);
+        javalin.post("/game",gameHandler::create);
 
 
     }

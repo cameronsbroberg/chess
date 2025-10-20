@@ -1,8 +1,6 @@
 package handler;
 
 import com.google.gson.Gson;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
 import dataaccess.UserDAO;
 import dataaccess.AuthDAO;
 import io.javalin.http.Context;
@@ -15,7 +13,7 @@ import service.InvalidTokenException;
 import service.UserService;
 
 public class UserHandler {//Handlers handle jsons. They pass models to the service and get http requests from the Server.
-    final private Gson serializer;
+    final private Gson serializer; //FIXME make an abstract class for handlers so you don't have to reuse these guys or the constructors
     final private UserService userService;
 
     public UserHandler(UserDAO userDAO, AuthDAO authDAO) {

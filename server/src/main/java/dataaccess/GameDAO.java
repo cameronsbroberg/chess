@@ -10,4 +10,5 @@ public interface GameDAO {
     Collection<GameData> listGames();
     void updateGame(int gameID, GameData gameData) throws DataAccessException; //FIXME: what parameters
     void clear();
+    int getNextID();
 }
