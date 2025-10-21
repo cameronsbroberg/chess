@@ -23,8 +23,8 @@ public class Server {
         javalin.post("/session", userHandler::login);
         javalin.delete("/session", userHandler::logout);
         javalin.post("/game",gameHandler::create);
-
-
+        javalin.get("/game",gameHandler::list);
+        javalin.put("/game",gameHandler::join);
     }
 
     public int run(int desiredPort) {
