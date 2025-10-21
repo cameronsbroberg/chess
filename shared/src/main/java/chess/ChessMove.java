@@ -32,12 +32,15 @@ public class ChessMove {
         }
         ChessMove chessMove = (ChessMove) o;
         if(promotionPiece == null && ((ChessMove) o).promotionPiece == null){
-            return startPosition.equals(((ChessMove) o).startPosition) && endPosition.equals(((ChessMove) o).endPosition);
+            return startPosition.equals(((ChessMove) o).startPosition)
+                    && endPosition.equals(((ChessMove) o).endPosition);
         }
         if(promotionPiece == null ^ ((ChessMove) o).promotionPiece == null){
             return false;
         }
-        return startPosition.equals(((ChessMove) o).startPosition) && endPosition.equals(((ChessMove) o).endPosition) && promotionPiece.equals(((ChessMove) o).promotionPiece);
+        return startPosition.equals(((ChessMove) o).startPosition)
+                && endPosition.equals(((ChessMove) o).endPosition)
+                && promotionPiece.equals(((ChessMove) o).promotionPiece);
     }
 
     @Override

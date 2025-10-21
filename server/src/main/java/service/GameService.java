@@ -14,7 +14,6 @@ import results.GameSummary;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
-import java.util.List;
 
 public class GameService {
     private final UserDAO userDAO;
@@ -97,6 +96,16 @@ public class GameService {
             } catch (DataAccessException e) {
                 throw new BadRequestException(e.getMessage());
             }
+        }
+    }
+
+    public void clear() {
+        try {
+            this.gameDAO.clear();
+            this.authDAO.clear();
+            this.userDAO.clear();
+        } catch (Exception e) {
+            throw new RuntimeException(e); //FIXME Just do something with this
         }
     }
 }

@@ -16,7 +16,9 @@ public class MemoryUserDAO implements UserDAO{
         if(users.containsKey(username)){
             return users.get(username);
         }
-        else throw new DataAccessException("Username not found");
+        else {
+            throw new DataAccessException("Username not found");
+        }
     }
 
     public void clear() {

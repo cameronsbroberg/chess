@@ -25,6 +25,7 @@ public class Server {
         javalin.post("/game",gameHandler::create);
         javalin.get("/game",gameHandler::list);
         javalin.put("/game",gameHandler::join);
+        javalin.delete("/db",gameHandler::clear);
     }
 
     public int run(int desiredPort) {

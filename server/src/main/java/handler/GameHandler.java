@@ -47,7 +47,9 @@ public class GameHandler {
         try {
             GameListResult gameListResult = gameService.listGames(authToken);
             ctx.status(200);
-            ctx.result(serializer.toJson(gameListResult)); //FIXME This doesn't fill it out if there is a missing value for any of the fields. Is that bad? I don't know
+            ctx.result(serializer.toJson(gameListResult));
+            //FIXME This doesn't fill it out if there is a missing value for any of the fields.
+            // Is that bad? I don't know
         } catch (InvalidTokenException e) {
             ctx.status(401);
             ctx.result(serializer.toJson(e.getMessage()));
@@ -71,5 +73,9 @@ public class GameHandler {
             ctx.status(401);
             ctx.result(serializer.toJson(e.getMessage()));
         }
+    }
+
+    public void clear(Context ctx) {
+        gameService.clear();
     }
 }

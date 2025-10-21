@@ -10,29 +10,7 @@ public class BishopMoveGenerator extends MoveGenerator{
     @Override
     public Collection<ChessMove> getMoves() {
         int[][] directions = {{-1,1},{1,1},{1,-1},{-1,-1}};
-        for(int[] dir : directions){
-            int row = startingPosition.getRow();
-            int col = startingPosition.getColumn();
-            while(true){
-                row = row + dir[0];
-                col = col + dir[1];
-                if(row > 8 || row < 1 || col > 8 || col < 1){
-                    break;
-                }
-                ChessPosition targetPosition = new ChessPosition(row,col);
-                if(board.getPiece(targetPosition) == null){
-                    validMoves.add(new ChessMove(startingPosition,targetPosition,null));
-                    continue;
-                }
-                if(board.getPiece(targetPosition).getTeamColor() != piece.getTeamColor()){
-                    validMoves.add(new ChessMove(startingPosition,targetPosition,null));
-                    break;
-                }
-                else{
-                    break;
-                }
-            }
-        }
+        slide(directions);
         return validMoves;
     }
 }

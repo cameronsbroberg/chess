@@ -43,7 +43,7 @@ public class UserServiceTests {
 
     @Test
     @DisplayName("Unsuccessfully login a bad username")
-    public void login_bad_user(){
+    public void loginBadUser(){
         UserService userService = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
         UserData firstUser = new UserData("Alice","pass123","hello@byu.edu");
         Assertions.assertDoesNotThrow(() -> userService.register(firstUser));
@@ -54,7 +54,7 @@ public class UserServiceTests {
 
     @Test
     @DisplayName("Unsuccessfully login with right username and wrong password")
-    public void login_bad_pw(){
+    public void loginBadPw(){
         UserService userService = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
         UserData firstUser = new UserData("Alice","pass123","hello@byu.edu");
         Assertions.assertDoesNotThrow(() -> userService.register(firstUser));
@@ -78,14 +78,14 @@ public class UserServiceTests {
 
     @Test
     @DisplayName("Unsuccessfully logout a fake authToken")
-    public void logout_bad_auth(){
+    public void logoutBadAuth(){
         UserService userService = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
         Assertions.assertThrows(InvalidTokenException.class, () -> userService.logout("fakeAuthTokenString"));
     }
 
     @Test
     @DisplayName("Unsuccessfully logout a user who is not logged in")
-    public void logout_offline_user(){
+    public void logoutOfflineUser(){
         UserService userService = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
         UserData firstUser = new UserData("Alice","pass123","hello@byu.edu");
         Assertions.assertDoesNotThrow(() -> userService.register(firstUser));

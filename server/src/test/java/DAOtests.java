@@ -1,12 +1,9 @@
-package custom_tests;
-
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import model.AuthData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import passoff.chess.EqualsTestingUtility;
 
 public class DAOtests {
 

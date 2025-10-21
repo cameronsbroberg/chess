@@ -59,7 +59,8 @@ public class GameServiceTests {
         MemoryAuthDAO memoryAuthDAO = new MemoryAuthDAO();
         MemoryGameDAO memoryGameDAO = new MemoryGameDAO();
         UserService userService = new UserService(memoryUserDAO, memoryAuthDAO);
-        GameService gameService = new GameService(memoryUserDAO, memoryAuthDAO, memoryGameDAO); //TODO Make an initialization function that creates instances of all these objects
+        GameService gameService = new GameService(memoryUserDAO, memoryAuthDAO, memoryGameDAO);
+        //TODO Make an initialization function that creates instances of all these objects
         UserData user = new UserData("Alice","pass123","hello@byu.edu");
         AuthData userAuth = Assertions.assertDoesNotThrow(() -> userService.register(user));
         CreateRequest createRequest = new CreateRequest(userAuth.authToken(),
