@@ -61,10 +61,12 @@ public class GameService {
     }
 
     public void joinGame(String authToken, JoinRequest joinRequest) throws BadRequestException{
-        if(isAuthorized(authToken)){
-            try{
-                GameData gameData = gameDAO.getGame(joinRequest.gameID());
-                String username = authDAO.getAuth(authToken).username();
+        if(!isAuthorized(authToken)) {
+            return;
+        }
+        try{
+            GameData gameData = gameDAO.getGame(joinRequest.gameID());
+            String username = authDAO.getAuth(authToken).username();
                 switch (joinRequest.teamColor()){
                     case WHITE -> {
                         if(gameData.whiteUsername() == null){
@@ -93,9 +95,8 @@ public class GameService {
                         }
                     }
                 }
-            } catch (DataAccessException e) {
-                throw new BadRequestException(e.getMessage());
-            }
+        } catch (DataAccessException e) {
+            throw new BadRequestException(e.getMessage());
         }
     }
 

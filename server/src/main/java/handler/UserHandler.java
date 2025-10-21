@@ -12,7 +12,7 @@ import service.InvalidTokenException;
 import service.UserService;
 
 public class UserHandler {//Handlers handle jsons. They pass models to the service and get http requests from the Server.
-    final private Gson serializer; //FIXME make an abstract class for handlers so you don't have to reuse these guys or the constructors
+    final private Gson serializer;
     final private UserService userService;
 
     public UserHandler(UserDAO userDAO, AuthDAO authDAO) {
