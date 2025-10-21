@@ -4,7 +4,6 @@ import model.GameData;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 public class MemoryGameDAO implements GameDAO{
     private int nextID = 1;
@@ -12,7 +11,7 @@ public class MemoryGameDAO implements GameDAO{
 
     public int createGame(GameData gameData) {
         games.put(nextID, gameData);
-        return nextID++; //FIXME: make sure that this actually updates afterwards.
+        return nextID++;
     }
 
     public int getNextID() {
@@ -24,7 +23,7 @@ public class MemoryGameDAO implements GameDAO{
             return games.get(gameID);
         }
         else{
-            throw new DataAccessException("Game not found");
+            throw new DataAccessException("Error: bad request");
         }
     }
 
@@ -37,11 +36,12 @@ public class MemoryGameDAO implements GameDAO{
             games.replace(gameID, gameData);
         }
         else{
-            throw new DataAccessException("Game not found");
+            throw new DataAccessException("Error: bad request");
         }
     }
 
     public void clear() {
         games.clear();
+        nextID = 1;
     }
 }

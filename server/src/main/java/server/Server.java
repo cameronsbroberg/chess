@@ -4,7 +4,6 @@ import dataaccess.*;
 import handler.GameHandler;
 import handler.UserHandler;
 import io.javalin.*;
-import io.javalin.http.Context;
 
 public class Server {
 

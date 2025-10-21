@@ -25,7 +25,7 @@ public class GameService {
             authDAO.getAuth(authToken);
             return true;
         } catch (DataAccessException e) {
-            throw new InvalidTokenException(e.getMessage());
+            throw new InvalidTokenException("Error: unauthorized");
         }
     }
 
@@ -100,12 +100,8 @@ public class GameService {
     }
 
     public void clear() {
-        try {
-            this.gameDAO.clear();
-            this.authDAO.clear();
-            this.userDAO.clear();
-        } catch (Exception e) {
-            throw new RuntimeException(e); //FIXME Just do something with this
-        }
+        this.gameDAO.clear();
+        this.authDAO.clear();
+        this.userDAO.clear();
     }
 }

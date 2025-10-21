@@ -8,7 +8,6 @@ import model.AuthData;
 import model.UserData;
 import requests.LoginRequest;
 import service.AlreadyTakenException;
-import service.InvalidLoginException;
 import service.InvalidTokenException;
 import service.UserService;
 
@@ -43,7 +42,7 @@ public class UserHandler {//Handlers handle jsons. They pass models to the servi
             result = userService.login(loginRequest);
             ctx.status(200);
             ctx.result(serializer.toJson(result));
-        } catch (InvalidLoginException e) {
+        } catch (InvalidTokenException e) {
             ctx.status(400);
             ctx.result(serializer.toJson(e.getMessage()));
         }

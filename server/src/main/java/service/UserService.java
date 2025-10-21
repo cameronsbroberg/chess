@@ -31,12 +31,12 @@ public class UserService {
         try {
             UserData userData = userDAO.getUser(username);
             if (!(loginRequest.password().equals(userData.password()))) {
-                throw new InvalidLoginException("Invalid password");
+                throw new InvalidTokenException("Error: unauthorized");
             }
             return authDAO.createAuth(username);
         }
         catch (DataAccessException e) {
-            throw new InvalidLoginException("Invalid username");
+            throw new InvalidTokenException("Error: unauthorized");
         }
     }
 
