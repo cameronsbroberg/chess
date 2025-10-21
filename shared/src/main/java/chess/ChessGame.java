@@ -85,12 +85,18 @@ public class ChessGame {
                 }
                 if(piece.getTeamColor() != teamColor){
                     Collection<ChessMove> enemyMoves = piece.pieceMoves(board,spaceToCheck);
-                    for (ChessMove enemyMove : enemyMoves){
-                        if(enemyMove.getEndPosition().equals(myKingPosition)){
-                            return true;
-                        }
+                    if(enemyPieceCanTakeKing(enemyMoves,myKingPosition)){
+                        return true;
                     }
                 }
+            }
+        }
+        return false;
+    }
+    private boolean enemyPieceCanTakeKing(Collection<ChessMove> enemyMoves, ChessPosition myKingPosition){
+        for (ChessMove enemyMove : enemyMoves){
+            if(enemyMove.getEndPosition().equals(myKingPosition)){
+                return true;
             }
         }
         return false;
