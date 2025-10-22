@@ -1,6 +1,5 @@
 package service;
 
-import chess.ChessGame;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
@@ -14,6 +13,8 @@ import results.GameSummary;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
+
+import static chess.ChessGame.TeamColor.*;
 
 public class GameService {
     private final UserDAO userDAO;
@@ -35,39 +36,50 @@ public class GameService {
         this.gameDAO = gameDAO;
     }
 
-    public GameListResult listGames(String authToken) {
-        if(isAuthorized(authToken)){
-            Collection<GameSummary> gameList = new ArrayDeque<>();
-            for (GameData game : gameDAO.listGames()){
-                GameSummary gameSummary = new GameSummary(game.gameId(),game.whiteUsername(),game.blackUsername(),game.gameName());
-                gameList.add(gameSummary);
-            }
-            return new GameListResult(gameList);
+    public GameListResult listGames(String authToken) throws InvalidTokenException{
+        if(!isAuthorized(authToken)) {
+            return null;
         }
-        return null; //Theoretically unreachable.
+        Collection<GameSummary> gameList = new ArrayDeque<>();
+        for (GameData game : gameDAO.listGames()){
+            GameSummary gameSummary = new GameSummary(game.gameId(),game.whiteUsername(),game.blackUsername(),game.gameName());
+            gameList.add(gameSummary);
+        }
+        return new GameListResult(gameList);
     }
 
-    public CreateResult createGame(CreateRequest createRequest) {
-        if(isAuthorized(createRequest.authToken())){
-            int gameID = gameDAO.getNextID();
-            GameData gameData = new GameData(gameID,
-                    createRequest.whiteUsername(),
-                    createRequest.blackUsername(),
-                    createRequest.gameName(),
-                    createRequest.game());
-            return new CreateResult(gameDAO.createGame(gameData));
+    public CreateResult createGame(CreateRequest createRequest)
+            throws BadRequestException,InvalidTokenException {
+        if(createRequest.authToken() == null |
+                createRequest.gameName() == null |
+                createRequest.game() == null){
+            throw new BadRequestException("Error: bad request");
         }
-        return null; //Theoretically unreachable
+        if(!isAuthorized(createRequest.authToken())){
+            return null;
+        }
+        int gameID = gameDAO.getNextID();
+        GameData gameData = new GameData(gameID,
+                createRequest.whiteUsername(),
+                createRequest.blackUsername(),
+                createRequest.gameName(),
+                createRequest.game());
+        return new CreateResult(gameDAO.createGame(gameData));
     }
 
-    public void joinGame(String authToken, JoinRequest joinRequest) throws BadRequestException{
+
+    public void joinGame(String authToken, JoinRequest joinRequest)
+            throws BadRequestException,InvalidTokenException,AlreadyTakenException{
         if(!isAuthorized(authToken)) {
             return;
         }
         try{
             GameData gameData = gameDAO.getGame(joinRequest.gameID());
             String username = authDAO.getAuth(authToken).username();
-                switch (joinRequest.teamColor()){
+                if(joinRequest.playerColor() != WHITE & joinRequest.playerColor() != BLACK){
+                    throw new BadRequestException("Error: bad request");
+                }
+                switch (joinRequest.playerColor()){
                     case WHITE -> {
                         if(gameData.whiteUsername() == null){
                             GameData updatedGameData = new GameData(gameData.gameId(),

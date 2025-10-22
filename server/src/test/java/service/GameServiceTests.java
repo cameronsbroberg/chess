@@ -13,6 +13,7 @@ import requests.CreateRequest;
 import requests.JoinRequest;
 import requests.LoginRequest;
 import results.CreateResult;
+import static chess.ChessGame.TeamColor.*;
 
 public class GameServiceTests {
     private MemoryUserDAO memoryUserDAO = new MemoryUserDAO();
@@ -124,7 +125,7 @@ public class GameServiceTests {
                 null,null,
                 "First game",new ChessGame());
         Assertions.assertDoesNotThrow(() -> gameService.createGame(createRequest));
-        Assertions.assertDoesNotThrow(() -> gameService.joinGame(userAuth.authToken(), new JoinRequest(ChessGame.TeamColor.WHITE, 1)));
+        Assertions.assertDoesNotThrow(() -> gameService.joinGame(userAuth.authToken(), new JoinRequest(WHITE, 1)));
     }
 
     @Test
@@ -137,7 +138,7 @@ public class GameServiceTests {
                 "First game",new ChessGame());
         Assertions.assertDoesNotThrow(() -> gameService.createGame(createRequest));
         Assertions.assertThrows(BadRequestException.class,
-                () -> gameService.joinGame(userAuth.authToken(), new JoinRequest(ChessGame.TeamColor.WHITE, 2)));
+                () -> gameService.joinGame(userAuth.authToken(), new JoinRequest(WHITE, 2)));
     }
 
     @Test
@@ -151,7 +152,7 @@ public class GameServiceTests {
         Assertions.assertDoesNotThrow(() -> gameService.createGame(createRequest));
         userService.logout(userAuth.authToken());
         Assertions.assertThrows(InvalidTokenException.class,
-                () -> gameService.joinGame(userAuth.authToken(), new JoinRequest(ChessGame.TeamColor.WHITE, 1)));
+                () -> gameService.joinGame(userAuth.authToken(), new JoinRequest(WHITE, 1)));
     }
 
     @Test
@@ -164,11 +165,11 @@ public class GameServiceTests {
                 "First game",new ChessGame());
         Assertions.assertDoesNotThrow(() -> gameService.createGame(createRequest));
         Assertions.assertDoesNotThrow(
-                () -> gameService.joinGame(userAuth.authToken(), new JoinRequest(ChessGame.TeamColor.WHITE, 1)));
+                () -> gameService.joinGame(userAuth.authToken(), new JoinRequest(WHITE, 1)));
         UserData secondUser = new UserData("Bob", "bobpass123","bob@email.com");
         AuthData secondAuth = userService.register(secondUser);
         Assertions.assertDoesNotThrow(
-                () -> gameService.joinGame(secondAuth.authToken(), new JoinRequest(ChessGame.TeamColor.BLACK, 1)));
+                () -> gameService.joinGame(secondAuth.authToken(), new JoinRequest(BLACK, 1)));
     }
 
     @Test
@@ -181,11 +182,11 @@ public class GameServiceTests {
                 "First game",new ChessGame());
         Assertions.assertDoesNotThrow(() -> gameService.createGame(createRequest));
         Assertions.assertDoesNotThrow(
-                () -> gameService.joinGame(userAuth.authToken(), new JoinRequest(ChessGame.TeamColor.BLACK, 1)));
+                () -> gameService.joinGame(userAuth.authToken(), new JoinRequest(BLACK, 1)));
         UserData secondUser = new UserData("Bob", "bobpass123","bob@email.com");
         AuthData secondAuth = userService.register(secondUser);
         Assertions.assertThrows(AlreadyTakenException.class,
-                () -> gameService.joinGame(secondAuth.authToken(), new JoinRequest(ChessGame.TeamColor.BLACK, 1)));
+                () -> gameService.joinGame(secondAuth.authToken(), new JoinRequest(BLACK, 1)));
     }
 
     @Test

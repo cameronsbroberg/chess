@@ -15,8 +15,12 @@ public class UserService {
         this.authDAO = authDAO;
     }
 
-    public AuthData register(UserData registerRequest) {//I don't think I need a specific RegisterRequest class
+    public AuthData register(UserData registerRequest)
+            throws BadRequestException,AlreadyTakenException{
         String username = registerRequest.username();
+        if(username == null | registerRequest.password() == null | registerRequest == null){
+            throw new BadRequestException("Error: bad request");
+        }
         try {
             userDAO.getUser(username);
             throw new AlreadyTakenException("Error: already taken");
@@ -26,8 +30,11 @@ public class UserService {
         }
     }
 
-    public AuthData login(LoginRequest loginRequest) {
+    public AuthData login(LoginRequest loginRequest) throws InvalidTokenException,BadRequestException {
         String username = loginRequest.username();
+        if(username == null | loginRequest.password() == null){
+            throw new BadRequestException("Error: bad request");
+        }
         try {
             UserData userData = userDAO.getUser(username);
             if (!(loginRequest.password().equals(userData.password()))) {
@@ -41,6 +48,9 @@ public class UserService {
     }
 
     public void logout(String authToken) {
+        if(authToken == null){
+            throw new BadRequestException("Error: bad request");
+        }
         try {
             authDAO.deleteAuth(authToken);
         } catch (DataAccessException e) {

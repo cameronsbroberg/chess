@@ -15,6 +15,8 @@ import service.BadRequestException;
 import service.GameService;
 import service.InvalidTokenException;
 
+import java.util.Map;
+
 public class GameHandler {
     final private Gson serializer;
     final private GameService gameService;
@@ -26,19 +28,26 @@ public class GameHandler {
 
     public void create(Context ctx){
         String authToken = ctx.header("authorization");
-        String gameName = ctx.formParam("gameName");
-        CreateRequest createRequest = new CreateRequest(authToken,
-                null,
-                null,
-                gameName,
+        CreateRequest json = serializer.fromJson(ctx.body(), CreateRequest.class);
+        CreateRequest createRequest = new CreateRequest(
+                authToken,
+                json.whiteUsername(),
+                json.blackUsername(),
+                json.gameName(),
                 new ChessGame());
         try {
             CreateResult createResult = gameService.createGame(createRequest);
             ctx.status(200);
             ctx.result(serializer.toJson(createResult));
+        } catch (BadRequestException e) {
+            ctx.status(400);
+            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
         } catch (InvalidTokenException e) {
             ctx.status(401);
-            ctx.result(serializer.toJson(e.getMessage()));
+            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
+        } catch (Exception e) {
+            ctx.status(500);
+            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
         }
     }
 
@@ -48,11 +57,12 @@ public class GameHandler {
             GameListResult gameListResult = gameService.listGames(authToken);
             ctx.status(200);
             ctx.result(serializer.toJson(gameListResult));
-            //FIXME This doesn't fill it out if there is a missing value for any of the fields.
-            // Is that bad? I don't know
         } catch (InvalidTokenException e) {
             ctx.status(401);
-            ctx.result(serializer.toJson(e.getMessage()));
+            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
+        } catch (Exception e) {
+            ctx.status(500);
+            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
         }
     }
 
@@ -65,17 +75,25 @@ public class GameHandler {
             ctx.result("{}");
         } catch (BadRequestException e) {
             ctx.status(400);
-            ctx.result(serializer.toJson(e.getMessage()));
+            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
         } catch (AlreadyTakenException e) {
             ctx.status(403);
-            ctx.result(serializer.toJson(e.getMessage()));
+            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
         } catch (InvalidTokenException e) {
             ctx.status(401);
-            ctx.result(serializer.toJson(e.getMessage()));
+            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
+        } catch (Exception e) {
+            ctx.status(500);
+            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
         }
     }
 
     public void clear(Context ctx) {
-        gameService.clear();
+        try {
+            gameService.clear();
+        } catch (Exception e) {
+            ctx.status(500);
+            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
+        }
     }
 }
