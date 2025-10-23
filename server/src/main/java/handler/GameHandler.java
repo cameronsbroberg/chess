@@ -17,12 +17,11 @@ import service.InvalidTokenException;
 
 import java.util.Map;
 
-public class GameHandler {
-    final private Gson serializer;
+public class GameHandler extends Handler {
     final private GameService gameService;
 
     public GameHandler(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
-        this.serializer = new Gson();
+        super();
         this.gameService = new GameService(userDAO, authDAO, gameDAO);
     }
 
@@ -39,15 +38,8 @@ public class GameHandler {
             CreateResult createResult = gameService.createGame(createRequest);
             ctx.status(200);
             ctx.result(serializer.toJson(createResult));
-        } catch (BadRequestException e) {
-            ctx.status(400);
-            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
-        } catch (InvalidTokenException e) {
-            ctx.status(401);
-            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
         } catch (Exception e) {
-            ctx.status(500);
-            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
+            handleException(e,ctx);
         }
     }
 
@@ -57,12 +49,8 @@ public class GameHandler {
             GameListResult gameListResult = gameService.listGames(authToken);
             ctx.status(200);
             ctx.result(serializer.toJson(gameListResult));
-        } catch (InvalidTokenException e) {
-            ctx.status(401);
-            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
         } catch (Exception e) {
-            ctx.status(500);
-            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
+            handleException(e,ctx);
         }
     }
 
@@ -73,18 +61,8 @@ public class GameHandler {
             gameService.joinGame(authToken, joinRequest);
             ctx.status(200);
             ctx.result("{}");
-        } catch (BadRequestException e) {
-            ctx.status(400);
-            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
-        } catch (AlreadyTakenException e) {
-            ctx.status(403);
-            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
-        } catch (InvalidTokenException e) {
-            ctx.status(401);
-            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
         } catch (Exception e) {
-            ctx.status(500);
-            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
+            handleException(e,ctx);
         }
     }
 
@@ -92,8 +70,7 @@ public class GameHandler {
         try {
             gameService.clear();
         } catch (Exception e) {
-            ctx.status(500);
-            ctx.result(serializer.toJson(Map.of("message",e.getMessage())));
+            handleException(e,ctx);
         }
     }
 }
