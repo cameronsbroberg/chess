@@ -1,7 +1,6 @@
 package handler;
 
 import chess.ChessGame;
-import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
@@ -10,12 +9,7 @@ import requests.CreateRequest;
 import requests.JoinRequest;
 import results.CreateResult;
 import results.GameListResult;
-import service.AlreadyTakenException;
-import service.BadRequestException;
 import service.GameService;
-import service.InvalidTokenException;
-
-import java.util.Map;
 
 public class GameHandler extends Handler {
     final private GameService gameService;

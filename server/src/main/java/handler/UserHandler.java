@@ -1,6 +1,5 @@
 package handler;
 
-import com.google.gson.Gson;
 import dataaccess.UserDAO;
 import dataaccess.AuthDAO;
 import io.javalin.http.Context;
