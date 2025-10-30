@@ -6,10 +6,6 @@ import java.util.UUID;
 public class MemoryAuthDAO implements AuthDAO{
     private HashMap<String, AuthData> authorizations = new HashMap<>();
 
-    public String generateToken() {
-        return UUID.randomUUID().toString();
-    }
-
     public AuthData createAuth(String username) {
         String authToken = generateToken();
         AuthData authData = new AuthData(authToken, username);
