@@ -82,11 +82,14 @@ public class MySqlAuthDAO implements AuthDAO{
             String statement = "DELETE FROM authData WHERE authToken = ?";
             try(var preparedStatement = conn.prepareStatement(statement)){
                 preparedStatement.setString(1,authToken);
-                preparedStatement.executeUpdate();
+                int rows_affected = preparedStatement.executeUpdate();
+                if (rows_affected == 0){
+                    throw new DataAccessException("Authtoken not found");
+                }
             }
         }
         catch(SQLException e){//FIXME: Distinguish between when authToken is not there and when the database is not there.
-            throw new DataAccessException("Authtoken not found");
+            throw new ResponseException(e.getMessage());
         }
     }
 
