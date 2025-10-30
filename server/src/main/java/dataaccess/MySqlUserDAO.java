@@ -10,7 +10,7 @@ public class MySqlUserDAO implements UserDAO{
         try {
             configureDatabase();
         } catch (DataAccessException e) {
-            throw new RuntimeException(e); //FIXME: this should not throw a Runtime Exception
+            throw new ResponseException(e.getMessage()); //TODO: What.p
         }
     }
 //    private final String[] createStatements = {
@@ -61,6 +61,7 @@ public class MySqlUserDAO implements UserDAO{
             throw new ResponseException(String.format("Unable to configure database: %s",e.getMessage()));
         }
     }
+
     @Override
     public void createUser(UserData userData) throws ResponseException{
         try (var conn = DatabaseManager.getConnection()){
@@ -104,14 +105,14 @@ public class MySqlUserDAO implements UserDAO{
     }
 
     @Override
-    public void clear() throws ResponseException{ //FIXME this should probably throw a ResponseException
+    public void clear() throws ResponseException{
         try(var conn = DatabaseManager.getConnection()){
-            String statement = "TRUNCATE TABLE user"; //TODO: Should this be truncate instead?
+            String statement = "TRUNCATE TABLE user"; //TODO: Should this be DROP instead?
             try(var preparedStatement = conn.prepareStatement(statement)){
                 preparedStatement.executeUpdate();
             }
         }
-        catch (SQLException | DataAccessException e) {//FIXME you should probably deal with this somewhere else.
+        catch (SQLException | DataAccessException e) {
             throw new ResponseException(String.format("Unable to configure database: %s",e.getMessage()));
         }
     }
