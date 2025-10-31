@@ -13,35 +13,6 @@ public class MySqlUserDAO implements UserDAO{
             throw new ResponseException(e.getMessage()); //TODO: What.p
         }
     }
-//    private final String[] createStatements = {
-//            """
-//            CREATE TABLE IF NOT EXISTS user(
-//            id INT NOT NULL AUTO_INCREMENT,
-//            username VARCHAR(255) NOT NULL,
-//            password VARCHAR(255) NOT NULL,
-//            email VARCHAR(255) NOT NULL,
-//            PRIMARY KEY (id)
-//            );
-//            """,
-//            """
-//            CREATE TABLE IF NOT EXISTS authData (
-//            authToken VARCHAR(255) NOT NULL,
-//            username VARCHAR(255) NOT NULL,
-//            PRIMARY KEY (authToken)
-//            );
-//            """,
-//
-//            """
-//            CREATE TABLE IF NOT EXISTS gameData (
-//            gameID INT NOT NULL AUTO_INCREMENT,
-//            whiteUsername VARCHAR(255),
-//            blackUsername VARCHAR(255),
-//            gameName VARCHAR(255) NOT NULL,
-//            game VARCHAR(255) NOT NULL,
-//            PRIMARY KEY (gameID)
-//            );
-//            """
-//    };
     private void configureDatabase() throws DataAccessException{
         DatabaseManager.createDatabase();
         try(var conn = DatabaseManager.getConnection()){
