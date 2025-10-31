@@ -1,13 +1,11 @@
 package dataaccess;
 
-import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
-import model.UserData;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class MySqlGameDAO implements GameDAO{
     private Gson serializer;
@@ -54,7 +52,7 @@ public class MySqlGameDAO implements GameDAO{
                 preparedStatement.executeUpdate();
                 String iDStatement = "SELECT LAST_INSERT_ID();";
                 try(var preparedIdStatement = conn.prepareStatement(iDStatement)){
-                    var response = preparedStatement.executeQuery();
+                    var response = preparedIdStatement.executeQuery();
                     while(response.next()){
                         int id = response.getInt("gameID");
                         return id;
@@ -99,21 +97,63 @@ public class MySqlGameDAO implements GameDAO{
 
     @Override
     public Collection<GameData> listGames() {
-        return List.of();
+        try (var conn = DatabaseManager.getConnection()){
+            String statement = "SELECT * FROM gameData;";
+            try(var preparedStatement = conn.prepareStatement(statement)){
+                try(var response = preparedStatement.executeQuery()){
+                    Collection<GameData> games = new ArrayList<>();
+                    while(response.next()){
+                        int gameID = response.getInt("gameId");
+                        String whiteUsername = response.getString("whiteUsername");
+                        String blackUsername = response.getString("blackUsername");
+                        String gameName = response.getString("gameName");
+                        String gameString = response.getString("game");
+                        chess.ChessGame chessGame = serializer.fromJson(gameString, chess.ChessGame.class);
+                        GameData gameData = new GameData(gameID,whiteUsername,blackUsername,gameName,chessGame);
+                        games.add(gameData);
+                    }
+                    return games;
+                }
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new ResponseException(e.getMessage());
+        }
     }
 
     @Override
     public void updateGame(int gameID, GameData gameData) throws DataAccessException {
-
+        getGame(gameID); //getGame should throw a DAexception if the game isn't there.
+        try (var conn = DatabaseManager.getConnection()){
+            String statement = "UPDATE gameData SET whiteUsername = ?, blackUsername = ?, gameName = ?, game WHERE gameId = ?;";
+            String gameString = serializer.toJson(gameData.game());
+            try(var preparedStatement = conn.prepareStatement(statement)){
+                preparedStatement.setString(1, gameData.whiteUsername());
+                preparedStatement.setString(2, gameData.blackUsername());
+                preparedStatement.setString(3, gameData.gameName());
+                preparedStatement.setString(4,gameString);
+                preparedStatement.setInt(5,gameID);
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new ResponseException(e.getMessage());
+        }
     }
 
     @Override
     public void clear() {
-
+        try(var conn = DatabaseManager.getConnection()){
+            String statement = "TRUNCATE TABLE gameData"; //TODO: Should this be DROP instead?
+            try(var preparedStatement = conn.prepareStatement(statement)){
+                preparedStatement.executeUpdate();
+            }
+        }
+        catch (SQLException | DataAccessException e) {
+            throw new ResponseException(String.format("Unable to configure database: %s",e.getMessage()));
+        }
     }
 
     @Override
     public int getNextID() {
-        return 0;
+        return 0; //This should be fine since it's only used in GameService::createGame, while the DAO::createGame ignores it
     }
 }
