@@ -15,7 +15,7 @@ public class MySqlGameDAO implements GameDAO{
         } catch (DataAccessException e) {
             throw new ResponseException(e.getMessage());
         }
-        Gson serializer = new Gson();
+        this.serializer = new Gson();
 
     }
     private void configureDatabase() throws DataAccessException{
@@ -24,10 +24,10 @@ public class MySqlGameDAO implements GameDAO{
             String statement =             """
                 CREATE TABLE IF NOT EXISTS gameData (
                 gameId INT NOT NULL AUTO_INCREMENT,
-                whiteUsername VARCHAR(255),
-                blackUsername VARCHAR(255),
-                gameName VARCHAR(255) NOT NULL,
-                game VARCHAR(255) NOT NULL,
+                whiteUsername VARCHAR(30),
+                blackUsername VARCHAR(30),
+                gameName VARCHAR(30) NOT NULL,
+                game VARCHAR(2000) NOT NULL,
                 PRIMARY KEY (gameID)
                 );
             """;
@@ -54,7 +54,7 @@ public class MySqlGameDAO implements GameDAO{
                 try(var preparedIdStatement = conn.prepareStatement(iDStatement)){
                     var response = preparedIdStatement.executeQuery();
                     while(response.next()){
-                        int id = response.getInt("gameID");
+                        int id = response.getInt("LAST_INSERT_ID()");
                         return id;
                     }
                 }
@@ -65,7 +65,7 @@ public class MySqlGameDAO implements GameDAO{
         } catch (DataAccessException e) {
             throw new ResponseException(e.getMessage());
         }
-        return 0;
+        return -404; //Theoretically unreachable
     }
 
     @Override
@@ -124,7 +124,7 @@ public class MySqlGameDAO implements GameDAO{
     public void updateGame(int gameID, GameData gameData) throws DataAccessException {
         getGame(gameID); //getGame should throw a DAexception if the game isn't there.
         try (var conn = DatabaseManager.getConnection()){
-            String statement = "UPDATE gameData SET whiteUsername = ?, blackUsername = ?, gameName = ?, game WHERE gameId = ?;";
+            String statement = "UPDATE gameData SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameId = ?;";
             String gameString = serializer.toJson(gameData.game());
             try(var preparedStatement = conn.prepareStatement(statement)){
                 preparedStatement.setString(1, gameData.whiteUsername());
