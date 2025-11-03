@@ -1,42 +1,44 @@
 package dataaccess;
 
-import chess.ChessGame;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
+import javax.xml.crypto.Data;
 import java.sql.SQLException;
 
 public class MySqlUserDAO implements UserDAO{
     public MySqlUserDAO() {
         try {
             configureDatabase();
-        } catch (DataAccessException e) {
-            throw new ResponseException(e.getMessage()); //TODO: What.p
-        }
+        } catch (Exception e) {
+            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
     }
-    private void configureDatabase() throws DataAccessException{
-        DatabaseManager.createDatabase();
-        try(var conn = DatabaseManager.getConnection()){
-            String statement =             """
-            CREATE TABLE IF NOT EXISTS user(
-            username VARCHAR(255) NOT NULL,
-            password VARCHAR(255) NOT NULL,
-            email VARCHAR(255) NOT NULL,
-            PRIMARY KEY (username)
-            );
-            """;
-            try(var preparedStatement = conn.prepareStatement(statement)){
-                preparedStatement.executeUpdate();
+    private void configureDatabase() {
+        try {
+            DatabaseManager.createDatabase();
+            try (var conn = DatabaseManager.getConnection()) {
+                String statement = """
+                CREATE TABLE IF NOT EXISTS user(
+                username VARCHAR(255) NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NOT NULL,
+                PRIMARY KEY (username)
+                );
+                """;
+                try(var preparedStatement = conn.prepareStatement(statement)){
+                    preparedStatement.executeUpdate();
+                }
             }
         }
-        catch (SQLException e) {
-            throw new ResponseException(String.format("Unable to configure database: %s",e.getMessage()));
+        catch (SQLException | DataAccessException e) {
+            throw new ResponseException(String.format("Error: unable to configure database: %s",e.getMessage()));
         }
     }
 
     private String encryptPassword(String plainTextPassword){
         return BCrypt.hashpw(plainTextPassword,BCrypt.gensalt());
     }
+
     @Override
     public void createUser(UserData userData) throws ResponseException{
         String encryptedPw = encryptPassword(userData.password());
@@ -48,10 +50,8 @@ public class MySqlUserDAO implements UserDAO{
                 preparedStatement.setString(3, userData.email());
                 preparedStatement.executeUpdate();
             }
-        } catch (SQLException e) {
-            throw new ResponseException(e.getMessage());
-        } catch (DataAccessException e) {
-            throw new ResponseException(e.getMessage());
+        } catch (SQLException | DataAccessException e) {
+            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));
         }
     }
 
@@ -76,20 +76,20 @@ public class MySqlUserDAO implements UserDAO{
             }
         }
         catch(SQLException e){
-            throw new ResponseException(e.getMessage());
+            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));
         }
     }
 
     @Override
     public void clear() throws ResponseException{
         try(var conn = DatabaseManager.getConnection()){
-            String statement = "TRUNCATE TABLE user"; //TODO: Should this be DROP instead?
+            String statement = "TRUNCATE TABLE user";
             try(var preparedStatement = conn.prepareStatement(statement)){
                 preparedStatement.executeUpdate();
             }
         }
         catch (SQLException | DataAccessException e) {
-            throw new ResponseException(String.format("Unable to configure database: %s",e.getMessage()));
+            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));
         }
     }
 }

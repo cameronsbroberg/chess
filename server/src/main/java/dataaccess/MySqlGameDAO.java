@@ -13,8 +13,7 @@ public class MySqlGameDAO implements GameDAO{
         try {
             configureDatabase();
         } catch (DataAccessException e) {
-            throw new ResponseException(e.getMessage());
-        }
+            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
         this.serializer = new Gson();
 
     }
@@ -36,8 +35,7 @@ public class MySqlGameDAO implements GameDAO{
             }
         }
         catch (SQLException e) {
-            throw new ResponseException(String.format("Unable to configure database: %s",e.getMessage()));
-        }
+            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
     }
     @Override
     public int createGame(GameData gameData) {
@@ -60,11 +58,8 @@ public class MySqlGameDAO implements GameDAO{
                 }
 
             }
-        } catch (SQLException e) {
-            throw new ResponseException(e.getMessage());
-        } catch (DataAccessException e) {
-            throw new ResponseException(e.getMessage());
-        }
+        } catch (SQLException | DataAccessException e) {
+            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
         return -404; //Theoretically unreachable
     }
 
@@ -91,8 +86,7 @@ public class MySqlGameDAO implements GameDAO{
                 }
             }
         } catch (SQLException e) {
-            throw new ResponseException(e.getMessage());
-        }
+            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
     }
 
     @Override
@@ -116,8 +110,7 @@ public class MySqlGameDAO implements GameDAO{
                 }
             }
         } catch (SQLException | DataAccessException e) {
-            throw new ResponseException(e.getMessage());
-        }
+            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
     }
 
     @Override
@@ -135,21 +128,19 @@ public class MySqlGameDAO implements GameDAO{
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new ResponseException(e.getMessage());
-        }
+            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
     }
 
     @Override
     public void clear() {
         try(var conn = DatabaseManager.getConnection()){
-            String statement = "TRUNCATE TABLE gameData"; //TODO: Should this be DROP instead?
+            String statement = "TRUNCATE TABLE gameData";
             try(var preparedStatement = conn.prepareStatement(statement)){
                 preparedStatement.executeUpdate();
             }
         }
         catch (SQLException | DataAccessException e) {
-            throw new ResponseException(String.format("Unable to configure database: %s",e.getMessage()));
-        }
+            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
     }
 
     @Override

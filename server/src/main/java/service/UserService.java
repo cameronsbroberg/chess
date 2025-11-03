@@ -1,10 +1,8 @@
 package service;
 
-import dataaccess.AuthDAO;
-import dataaccess.DataAccessException;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
-import dataaccess.UserDAO;
 import org.mindrot.jbcrypt.BCrypt;
 import requests.LoginRequest;
 
@@ -38,8 +36,14 @@ public class UserService {
         }
         try {
             UserData userData = userDAO.getUser(username);
-            if (!(BCrypt.checkpw(loginRequest.password(),userData.password()))){
-                throw new InvalidTokenException("Error: unauthorized");
+            if(this.userDAO.getClass() == MySqlUserDAO.class){
+                if (!(BCrypt.checkpw(loginRequest.password(),userData.password()))){
+                    throw new InvalidTokenException("Error: unauthorized");
+                }
+            } else if (this.userDAO.getClass() == MemoryUserDAO.class) {
+                if (!(loginRequest.password().equals(userData.password()))) {
+                    throw new InvalidTokenException("Error: unauthorized");
+                }
             }
             return authDAO.createAuth(username);
         }

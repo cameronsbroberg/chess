@@ -9,8 +9,7 @@ public class MySqlAuthDAO implements AuthDAO{
         try {
             configureDatabase();
         } catch (DataAccessException e) {
-            throw new ResponseException(e.getMessage());
-        }
+            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
     }
 
     private void configureDatabase() throws DataAccessException{
@@ -42,11 +41,8 @@ public class MySqlAuthDAO implements AuthDAO{
                 preparedStatement.setString(2, username);
                 preparedStatement.executeUpdate();
             }
-        } catch (SQLException e) {
-            throw new ResponseException(e.getMessage());
-        } catch (DataAccessException e) {
-            throw new ResponseException(e.getMessage());
-        }
+        } catch (SQLException | DataAccessException e) {
+            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
         return new AuthData(authToken,username);
     }
 
@@ -70,8 +66,7 @@ public class MySqlAuthDAO implements AuthDAO{
             }
         }
         catch(SQLException e){
-            throw new ResponseException(e.getMessage());
-        }
+            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
     }
 
     @Override
@@ -87,20 +82,18 @@ public class MySqlAuthDAO implements AuthDAO{
             }
         }
         catch(SQLException e){
-            throw new ResponseException(e.getMessage());
-        }
+            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
     }
 
     @Override
     public void clear() {
         try(var conn = DatabaseManager.getConnection()){
-            String statement = "TRUNCATE TABLE authData"; //TODO: Should this be DROP instead?
+            String statement = "TRUNCATE TABLE authData";
             try(var preparedStatement = conn.prepareStatement(statement)){
                 preparedStatement.executeUpdate();
             }
         }
         catch (SQLException | DataAccessException e) {
-            throw new ResponseException(String.format("Unable to configure database: %s",e.getMessage()));
-        }
+            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
     }
 }
