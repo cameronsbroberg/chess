@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 
@@ -33,13 +34,17 @@ public class MySqlUserDAO implements UserDAO{
         }
     }
 
+    private String encryptPassword(String plainTextPassword){
+        return BCrypt.hashpw(plainTextPassword,BCrypt.gensalt());
+    }
     @Override
     public void createUser(UserData userData) throws ResponseException{
+        String encryptedPw = encryptPassword(userData.password());
         try (var conn = DatabaseManager.getConnection()){
             String statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?);";
             try(var preparedStatement = conn.prepareStatement(statement)){
                 preparedStatement.setString(1, userData.username());
-                preparedStatement.setString(2, userData.password());
+                preparedStatement.setString(2, encryptedPw);
                 preparedStatement.setString(3, userData.email());
                 preparedStatement.executeUpdate();
             }

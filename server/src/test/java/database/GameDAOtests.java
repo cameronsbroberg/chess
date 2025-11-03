@@ -5,7 +5,6 @@ import dataaccess.DataAccessException;
 import dataaccess.MySqlGameDAO;
 import dataaccess.ResponseException;
 import model.GameData;
-import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
