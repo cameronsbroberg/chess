@@ -14,16 +14,23 @@ public class UserService {
         this.authDAO = authDAO;
     }
 
-    public AuthData register(UserData registerRequest)
+    private String encryptPassword(String plainTextPassword){
+        return BCrypt.hashpw(plainTextPassword,BCrypt.gensalt());
+    }
+
+    public AuthData register(UserData rawRegisterRequest)
             throws BadRequestException,AlreadyTakenException{
-        String username = registerRequest.username();
-        if(username == null | registerRequest.password() == null | registerRequest == null){
+        String username = rawRegisterRequest.username();
+        String email = rawRegisterRequest.email();
+        if(username == null | rawRegisterRequest.password() == null | email == null){
             throw new BadRequestException("Error: bad request");
         }
+        String encryptedPw = encryptPassword(rawRegisterRequest.password());
         try {
             userDAO.getUser(username);
             throw new AlreadyTakenException("Error: already taken");
         } catch (DataAccessException e) {
+            UserData registerRequest = new UserData(username, encryptedPw, email);
             userDAO.createUser(registerRequest);
             return authDAO.createAuth(registerRequest.username());
         }
@@ -36,14 +43,8 @@ public class UserService {
         }
         try {
             UserData userData = userDAO.getUser(username);
-            if(this.userDAO.getClass() == MySqlUserDAO.class){
-                if (!(BCrypt.checkpw(loginRequest.password(),userData.password()))){
-                    throw new InvalidTokenException("Error: unauthorized");
-                }
-            } else if (this.userDAO.getClass() == MemoryUserDAO.class) {
-                if (!(loginRequest.password().equals(userData.password()))) {
-                    throw new InvalidTokenException("Error: unauthorized");
-                }
+            if (!(BCrypt.checkpw(loginRequest.password(),userData.password()))){
+                throw new InvalidTokenException("Error: unauthorized");
             }
             return authDAO.createAuth(username);
         }
