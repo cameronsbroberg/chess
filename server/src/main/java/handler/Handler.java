@@ -17,7 +17,9 @@ public abstract class Handler {
     }
     protected void handleException(Exception e, Context ctx){
         switch (e) {
-            case BadRequestException badRequestException -> ctx.status(400); //When the user's request is missing some part of it, or when the request points to something that isn't there.
+            case BadRequestException badRequestException -> ctx.status(400);
+            //When the user's request is missing some part of it,
+            // or when the request points to something that isn't there.
             case InvalidTokenException invalidTokenException -> ctx.status(401); //When the user requires authorization and doesn't have it.
             case AlreadyTakenException alreadyTakenException -> ctx.status(403); //When the username is already taken.
             case DataAccessException dataAccessException -> ctx.status(500); //When the server tries to access the database and can't.

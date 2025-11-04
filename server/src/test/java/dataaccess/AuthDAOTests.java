@@ -1,8 +1,5 @@
-package database;
+package dataaccess;
 
-import dataaccess.AuthDAO;
-import dataaccess.DataAccessException;
-import dataaccess.MySqlAuthDAO;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
