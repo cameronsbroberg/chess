@@ -1,7 +1,8 @@
 package dataaccess;
 import model.AuthData;
+import service.InvalidTokenException;
+
 import java.util.HashMap;
-import java.util.UUID;
 
 public class MemoryAuthDAO implements AuthDAO{
     private HashMap<String, AuthData> authorizations = new HashMap<>();
@@ -22,7 +23,7 @@ public class MemoryAuthDAO implements AuthDAO{
         }
     }
 
-    public void deleteAuth(String authToken) throws DataAccessException{
+    public void deleteAuth(String authToken) throws DataAccessException, InvalidTokenException {
         if(authorizations.containsKey(authToken)){
             authorizations.remove(authToken);
         }

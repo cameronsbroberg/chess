@@ -21,11 +21,11 @@ public class GameService {
     private final AuthDAO authDAO;
     private final GameDAO gameDAO;
 
-    private boolean isAuthorized(String authToken) throws InvalidTokenException{
+    private boolean isAuthorized(String authToken) throws DataAccessException,InvalidTokenException {
         try {
             authDAO.getAuth(authToken);
             return true;
-        } catch (DataAccessException e) {
+        } catch (InvalidTokenException e) {
             throw new InvalidTokenException("Error: unauthorized");
         }
     }
@@ -36,10 +36,12 @@ public class GameService {
         this.gameDAO = gameDAO;
     }
 
-    public GameListResult listGames(String authToken) throws InvalidTokenException{
-        if(!isAuthorized(authToken)) {
-            return null;
-        }
+    public GameListResult listGames(String authToken)
+            throws InvalidTokenException, DataAccessException{
+//        if(!isAuthorized(authToken)) {
+//            throw new InvalidTokenException("Error: unauthorized");
+//        }
+        isAuthorized(authToken);
         Collection<GameSummary> gameList = new ArrayDeque<>();
         for (GameData game : gameDAO.listGames()){
             GameSummary gameSummary = new GameSummary(game.gameId(),game.whiteUsername(),game.blackUsername(),game.gameName());
@@ -49,15 +51,16 @@ public class GameService {
     }
 
     public CreateResult createGame(CreateRequest createRequest)
-            throws BadRequestException,InvalidTokenException {
+            throws BadRequestException,InvalidTokenException,DataAccessException {
         if(createRequest.authToken() == null |
                 createRequest.gameName() == null |
                 createRequest.game() == null){
             throw new BadRequestException("Error: bad request");
         }
-        if(!isAuthorized(createRequest.authToken())){
-            return null;
-        }
+//        if(!isAuthorized(createRequest.authToken())){
+//            throw new InvalidTokenException("Error: unauthorized");
+//        }
+        isAuthorized(createRequest.authToken());
         int gameID = gameDAO.getNextID();
         GameData gameData = new GameData(gameID,
                 createRequest.whiteUsername(),
@@ -69,10 +72,11 @@ public class GameService {
 
 
     public void joinGame(String authToken, JoinRequest joinRequest)
-            throws BadRequestException,InvalidTokenException,AlreadyTakenException{
-        if(!isAuthorized(authToken)) {
-            return;
-        }
+            throws BadRequestException,InvalidTokenException,AlreadyTakenException,DataAccessException{
+//        if(!isAuthorized(authToken)) {
+//            throw new InvalidTokenException("Error: unauthorized");
+//        }
+        isAuthorized(authToken);
         try{
             GameData gameData = gameDAO.getGame(joinRequest.gameID());
             String username = authDAO.getAuth(authToken).username();
@@ -107,12 +111,12 @@ public class GameService {
                         }
                     }
                 }
-        } catch (DataAccessException e) {
+        } catch (DataAccessException e) {//FIXME this shouldn't do this.
             throw new BadRequestException(e.getMessage());
         }
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException{
         this.gameDAO.clear();
         this.authDAO.clear();
         this.userDAO.clear();

@@ -13,9 +13,16 @@ public class Server {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
-        UserDAO userDAO = new MySqlUserDAO();
-        AuthDAO authDAO = new MySqlAuthDAO();
-        GameDAO gameDAO = new MySqlGameDAO();
+        UserDAO userDAO = null;
+        AuthDAO authDAO = null;
+        GameDAO gameDAO = null;
+        try {
+            userDAO = new MySqlUserDAO();
+            authDAO = new MySqlAuthDAO();
+            gameDAO = new MySqlGameDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         UserHandler userHandler = new UserHandler(userDAO, authDAO);
         GameHandler gameHandler = new GameHandler(userDAO, authDAO, gameDAO);
         javalin.post("/user", userHandler::register);

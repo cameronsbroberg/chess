@@ -1,16 +1,15 @@
 package dataaccess;
 
 import model.UserData;
+import service.BadRequestException;
+
 import java.sql.SQLException;
 
 public class MySqlUserDAO implements UserDAO{
-    public MySqlUserDAO() {
-        try {
-            configureDatabase();
-        } catch (Exception e) {
-            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
+    public MySqlUserDAO() throws DataAccessException{
+        configureDatabase();
     }
-    private void configureDatabase() {
+    private void configureDatabase() throws DataAccessException{
         try {
             DatabaseManager.createDatabase();
             try (var conn = DatabaseManager.getConnection()) {
@@ -27,13 +26,13 @@ public class MySqlUserDAO implements UserDAO{
                 }
             }
         }
-        catch (SQLException | DataAccessException e) {
-            throw new ResponseException(String.format("Error: unable to configure database: %s",e.getMessage()));
+        catch (SQLException e) {
+            throw new DataAccessException(String.format("Error: unable to configure database: %s",e.getMessage()));
         }
     }
 
     @Override
-    public void createUser(UserData userData) throws ResponseException{
+    public void createUser(UserData userData) throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()){
             String statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?);";
             try(var preparedStatement = conn.prepareStatement(statement)){
@@ -42,13 +41,14 @@ public class MySqlUserDAO implements UserDAO{
                 preparedStatement.setString(3, userData.email());
                 preparedStatement.executeUpdate();
             }
-        } catch (SQLException | DataAccessException e) {
-            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("Error: Internal Server error: %s",e.getMessage()));
         }
     }
 
     @Override
-    public UserData getUser(String username) throws DataAccessException {
+    public UserData getUser(String username)
+            throws DataAccessException, BadRequestException {
         try (var conn = DatabaseManager.getConnection()){
             String statement = "SELECT password, email FROM user WHERE username = ?";
             try(var preparedStatement = conn.prepareStatement(statement)){
@@ -61,27 +61,27 @@ public class MySqlUserDAO implements UserDAO{
                         userData = new UserData(username,password,email);
                     }
                     if(userData == null){
-                        throw new DataAccessException("Username not found");
+                        throw new BadRequestException("Username not found");
                     }
                     return userData;
                 }
             }
         }
         catch(SQLException e){
-            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));
+            throw new DataAccessException(String.format("Error: Internal Server error: %s",e.getMessage()));
         }
     }
 
     @Override
-    public void clear() throws ResponseException{
+    public void clear() throws DataAccessException{
         try(var conn = DatabaseManager.getConnection()){
             String statement = "TRUNCATE TABLE user";
             try(var preparedStatement = conn.prepareStatement(statement)){
                 preparedStatement.executeUpdate();
             }
         }
-        catch (SQLException | DataAccessException e) {
-            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));
+        catch (SQLException e) {
+            throw new DataAccessException(String.format("Error: Internal Server error: %s",e.getMessage()));
         }
     }
 }

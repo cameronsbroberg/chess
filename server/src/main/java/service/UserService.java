@@ -19,7 +19,7 @@ public class UserService {
     }
 
     public AuthData register(UserData rawRegisterRequest)
-            throws BadRequestException,AlreadyTakenException{
+            throws BadRequestException,AlreadyTakenException,DataAccessException{
         String username = rawRegisterRequest.username();
         String email = rawRegisterRequest.email();
         if(username == null | rawRegisterRequest.password() == null | email == null){
@@ -29,38 +29,36 @@ public class UserService {
         try {
             userDAO.getUser(username);
             throw new AlreadyTakenException("Error: already taken");
-        } catch (DataAccessException e) {
+        } catch (BadRequestException e) {
             UserData registerRequest = new UserData(username, encryptedPw, email);
             userDAO.createUser(registerRequest);
             return authDAO.createAuth(registerRequest.username());
         }
     }
 
-    public AuthData login(LoginRequest loginRequest) throws InvalidTokenException,BadRequestException {
+    public AuthData login(LoginRequest loginRequest)
+            throws InvalidTokenException,BadRequestException,DataAccessException {
         String username = loginRequest.username();
         if(username == null | loginRequest.password() == null){
             throw new BadRequestException("Error: bad request");
         }
+        UserData userData = null;
         try {
-            UserData userData = userDAO.getUser(username);
-            if (!(BCrypt.checkpw(loginRequest.password(),userData.password()))){
-                throw new InvalidTokenException("Error: unauthorized");
-            }
-            return authDAO.createAuth(username);
-        }
-        catch (DataAccessException e) {
+            userData = userDAO.getUser(username);
+        } catch (BadRequestException e) {
             throw new InvalidTokenException("Error: unauthorized");
         }
+        if (!(BCrypt.checkpw(loginRequest.password(),userData.password()))){
+            throw new InvalidTokenException("Error: unauthorized");
+        }
+        return authDAO.createAuth(username);
     }
 
-    public void logout(String authToken) {
+    public void logout(String authToken)
+            throws DataAccessException,InvalidTokenException{
         if(authToken == null){
-            throw new BadRequestException("Error: bad request");
-        }
-        try {
-            authDAO.deleteAuth(authToken);
-        } catch (DataAccessException e) {
             throw new InvalidTokenException("Error: unauthorized");
         }
+        authDAO.deleteAuth(authToken);
     }
 }

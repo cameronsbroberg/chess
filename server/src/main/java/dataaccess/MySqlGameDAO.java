@@ -2,18 +2,17 @@ package dataaccess;
 
 import com.google.gson.Gson;
 import model.GameData;
+import service.BadRequestException;
 
+import javax.xml.crypto.Data;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class MySqlGameDAO implements GameDAO{
     private Gson serializer;
-    public MySqlGameDAO() {
-        try {
-            configureDatabase();
-        } catch (DataAccessException e) {
-            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
+    public MySqlGameDAO() throws DataAccessException{
+        configureDatabase();
         this.serializer = new Gson();
 
     }
@@ -35,10 +34,10 @@ public class MySqlGameDAO implements GameDAO{
             }
         }
         catch (SQLException e) {
-            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
+            throw new DataAccessException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
     }
     @Override
-    public int createGame(GameData gameData) {
+    public int createGame(GameData gameData) throws DataAccessException {
         String gameString = serializer.toJson(gameData.game());
         try (var conn = DatabaseManager.getConnection()){
             String statement = "INSERT INTO gameData (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?);";
@@ -58,8 +57,8 @@ public class MySqlGameDAO implements GameDAO{
                 }
 
             }
-        } catch (SQLException | DataAccessException e) {
-            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
         return -404; //Theoretically unreachable
     }
 
@@ -80,17 +79,17 @@ public class MySqlGameDAO implements GameDAO{
                         gameData = new GameData(gameID,whiteUsername,blackUsername,gameName,chessGame);
                     }
                     if(gameData == null){
-                        throw new DataAccessException("Error: bad request");
+                        throw new BadRequestException("Error: bad request");
                     }
                     return gameData;
                 }
             }
         } catch (SQLException e) {
-            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
+            throw new DataAccessException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
     }
 
     @Override
-    public Collection<GameData> listGames() {
+    public Collection<GameData> listGames() throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()){
             String statement = "SELECT * FROM gameData;";
             try(var preparedStatement = conn.prepareStatement(statement)){
@@ -109,13 +108,13 @@ public class MySqlGameDAO implements GameDAO{
                     return games;
                 }
             }
-        } catch (SQLException | DataAccessException e) {
-            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
     }
 
     @Override
     public void updateGame(int gameID, GameData gameData) throws DataAccessException {
-        getGame(gameID); //getGame should throw a DAexception if the game isn't there.
+        getGame(gameID); //getGame should throw a BadRequestException(?) if the game isn't there.
         try (var conn = DatabaseManager.getConnection()){
             String statement = "UPDATE gameData SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameId = ?;";
             String gameString = serializer.toJson(gameData.game());
@@ -128,19 +127,20 @@ public class MySqlGameDAO implements GameDAO{
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
+            throw new DataAccessException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
     }
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException{
         try(var conn = DatabaseManager.getConnection()){
             String statement = "TRUNCATE TABLE gameData";
             try(var preparedStatement = conn.prepareStatement(statement)){
                 preparedStatement.executeUpdate();
             }
         }
-        catch (SQLException | DataAccessException e) {
-            throw new ResponseException(String.format("Error: Internal Server error: %s",e.getMessage()));        }
+        catch (SQLException e) {
+            throw new DataAccessException(String.format("Error: Internal Server error: %s",e.getMessage()));
+        }
     }
 
     @Override
