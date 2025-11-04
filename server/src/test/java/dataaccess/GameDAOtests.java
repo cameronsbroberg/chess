@@ -14,7 +14,7 @@ import java.util.Collection;
 public class GameDAOtests {
     private static final GameData TEST_GAME = new GameData(49,null,null,"FIRST GAME",new ChessGame());
     private static final GameData BAD_TEST_GAME = new GameData(78,null,null,null,null);
-    private static final Collection<GameData> gamesInOrder = new ArrayList<>();
+    private static final Collection<GameData> GAMES_IN_ORDER = new ArrayList<>();
     private static final GameData TEST_GAME_1 = new GameData(1,null,null,"First Game",new ChessGame());
     private static final GameData TEST_GAME_2 = new GameData(2,null,null,"Second Game",new ChessGame());
     private static final GameData TEST_GAME_3 = new GameData(3,null,null,"Third Game",new ChessGame());
@@ -62,14 +62,14 @@ public class GameDAOtests {
     @Test
     @DisplayName("Get list of games")
     public void getlist(){
-        gamesInOrder.add(TEST_GAME_1);
-        gamesInOrder.add(TEST_GAME_2);
-        gamesInOrder.add(TEST_GAME_3);
-        for (GameData game : gamesInOrder){
+        GAMES_IN_ORDER.add(TEST_GAME_1);
+        GAMES_IN_ORDER.add(TEST_GAME_2);
+        GAMES_IN_ORDER.add(TEST_GAME_3);
+        for (GameData game : GAMES_IN_ORDER){
             Assertions.assertDoesNotThrow(()->gameDao.createGame(game));
         }
         Collection<GameData> gameList = Assertions.assertDoesNotThrow(gameDao::listGames);
-        Assertions.assertEquals(gamesInOrder,gameList);
+        Assertions.assertEquals(GAMES_IN_ORDER,gameList);
     }
     @Test
     @DisplayName("Get empty list of games") //Hopefully this works as a negative test because I don't see another way to test
