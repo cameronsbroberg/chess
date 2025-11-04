@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
+import service.BadRequestException;
 import service.InvalidTokenException;
 
 import java.sql.SQLException;
@@ -25,12 +26,15 @@ public class MySqlAuthDAO implements AuthDAO{
             }
         }
         catch (SQLException e) {
-            throw new DataAccessException(String.format("Unable to configure database: %s",e.getMessage()));
+            throw new DataAccessException(String.format("Error: unable to configure database: %s",e.getMessage()));
         }
     }
 
     @Override
     public AuthData createAuth(String username) throws DataAccessException{
+        if(username == null){
+            throw new BadRequestException("Error: bad request");
+        }
         String authToken = generateToken();
         try (var conn = DatabaseManager.getConnection()){
             String statement = "INSERT INTO authData (authToken, username) VALUES (?, ?);";

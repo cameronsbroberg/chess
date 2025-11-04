@@ -61,7 +61,7 @@ public class MySqlUserDAO implements UserDAO{
                         userData = new UserData(username,password,email);
                     }
                     if(userData == null){
-                        throw new BadRequestException("Username not found");
+                        throw new BadRequestException("Error: username not found");
                     }
                     return userData;
                 }

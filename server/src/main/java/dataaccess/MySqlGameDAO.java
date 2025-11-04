@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import model.GameData;
 import service.BadRequestException;
 
-import javax.xml.crypto.Data;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,7 +62,8 @@ public class MySqlGameDAO implements GameDAO{
     }
 
     @Override
-    public GameData getGame(int gameID) throws DataAccessException {
+    public GameData getGame(int gameID)
+            throws DataAccessException,BadRequestException {
         try (var conn = DatabaseManager.getConnection()){
             String statement = "SELECT whiteUsername, blackUsername, gameName, game FROM gameData WHERE gameId = ?;";
             try(var preparedStatement = conn.prepareStatement(statement)){

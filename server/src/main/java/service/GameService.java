@@ -38,9 +38,6 @@ public class GameService {
 
     public GameListResult listGames(String authToken)
             throws InvalidTokenException, DataAccessException{
-//        if(!isAuthorized(authToken)) {
-//            throw new InvalidTokenException("Error: unauthorized");
-//        }
         isAuthorized(authToken);
         Collection<GameSummary> gameList = new ArrayDeque<>();
         for (GameData game : gameDAO.listGames()){
@@ -57,9 +54,6 @@ public class GameService {
                 createRequest.game() == null){
             throw new BadRequestException("Error: bad request");
         }
-//        if(!isAuthorized(createRequest.authToken())){
-//            throw new InvalidTokenException("Error: unauthorized");
-//        }
         isAuthorized(createRequest.authToken());
         int gameID = gameDAO.getNextID();
         GameData gameData = new GameData(gameID,
@@ -73,46 +67,39 @@ public class GameService {
 
     public void joinGame(String authToken, JoinRequest joinRequest)
             throws BadRequestException,InvalidTokenException,AlreadyTakenException,DataAccessException{
-//        if(!isAuthorized(authToken)) {
-//            throw new InvalidTokenException("Error: unauthorized");
-//        }
         isAuthorized(authToken);
-        try{
-            GameData gameData = gameDAO.getGame(joinRequest.gameID());
-            String username = authDAO.getAuth(authToken).username();
-                if(joinRequest.playerColor() != WHITE & joinRequest.playerColor() != BLACK){
-                    throw new BadRequestException("Error: bad request");
+        GameData gameData = gameDAO.getGame(joinRequest.gameID());
+        String username = authDAO.getAuth(authToken).username();
+        if(joinRequest.playerColor() != WHITE & joinRequest.playerColor() != BLACK){
+            throw new BadRequestException("Error: bad request");
+        }
+        switch (joinRequest.playerColor()){
+            case WHITE -> {
+                if(gameData.whiteUsername() == null){
+                    GameData updatedGameData = new GameData(gameData.gameId(),
+                            username,
+                            gameData.blackUsername(),
+                            gameData.gameName(),
+                            gameData.game());
+                    gameDAO.updateGame(updatedGameData.gameId(), updatedGameData);
                 }
-                switch (joinRequest.playerColor()){
-                    case WHITE -> {
-                        if(gameData.whiteUsername() == null){
-                            GameData updatedGameData = new GameData(gameData.gameId(),
-                                    username,
-                                    gameData.blackUsername(),
-                                    gameData.gameName(),
-                                    gameData.game());
-                            gameDAO.updateGame(updatedGameData.gameId(), updatedGameData);
-                        }
-                        else {
-                            throw new AlreadyTakenException("Error: already taken");
-                        }
-                    }
-                    case BLACK -> {
-                        if(gameData.blackUsername() == null){
-                            GameData updatedGameData = new GameData(gameData.gameId(),
-                                    gameData.whiteUsername(),
-                                    username,
-                                    gameData.gameName(),
-                                    gameData.game());
-                            gameDAO.updateGame(updatedGameData.gameId(), updatedGameData);
-                        }
-                        else {
-                            throw new AlreadyTakenException("Error: already taken");
-                        }
-                    }
+                else {
+                    throw new AlreadyTakenException("Error: already taken");
                 }
-        } catch (DataAccessException e) {//FIXME this shouldn't do this.
-            throw new BadRequestException(e.getMessage());
+            }
+            case BLACK -> {
+                if(gameData.blackUsername() == null){
+                    GameData updatedGameData = new GameData(gameData.gameId(),
+                            gameData.whiteUsername(),
+                            username,
+                            gameData.gameName(),
+                            gameData.game());
+                    gameDAO.updateGame(updatedGameData.gameId(), updatedGameData);
+                }
+                else {
+                    throw new AlreadyTakenException("Error: already taken");
+                }
+            }
         }
     }
 
