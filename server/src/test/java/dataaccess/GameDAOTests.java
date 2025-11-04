@@ -11,7 +11,7 @@ import service.BadRequestException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class GameDAOtests {
+public class GameDAOTests {
     private static final GameData TEST_GAME = new GameData(49,null,null,"FIRST GAME",new ChessGame());
     private static final GameData BAD_TEST_GAME = new GameData(78,null,null,null,null);
     private static final Collection<GameData> GAMES_IN_ORDER = new ArrayList<>();
