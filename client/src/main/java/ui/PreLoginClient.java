@@ -6,10 +6,7 @@ import requests.LoginRequest;
 import serverFacade.ResponseException;
 import serverFacade.ServerFacade;
 
-public class PreLoginClient implements Client{
-    private final ServerFacade serverFacade;
-    private Repl repl;
-
+public class PreLoginClient extends Client {
     public PreLoginClient(ServerFacade serverFacade, Repl repl){
         this.serverFacade = serverFacade;
         this.repl = repl;
@@ -51,6 +48,6 @@ public class PreLoginClient implements Client{
         }
     }
     private void enterPostLoginUi(String authToken){
-        repl.setClient(new PostLoginClient(authToken));
+        repl.setClient(new PostLoginClient(serverFacade,repl,authToken));
     }
 }

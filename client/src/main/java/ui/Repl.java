@@ -11,13 +11,13 @@ import static ui.EscapeSequences.*;
 
 public class Repl {
     private Client client;
-    private final Server server;
+//    private final Server server;
     private final ServerFacade serverFacade;
 
-    public Repl(){
-        server = new Server();
-        var port = server.run(0);
-        System.out.println("Started test HTTP server on " + port);
+    public Repl(String port){
+//        server = new Server();
+//        var port = server.run(0);
+//        System.out.println("Started test HTTP server on " + port);
         serverFacade = new ServerFacade("http://localhost:" + port);
         this.client = new PreLoginClient(serverFacade,this);
     }
@@ -37,6 +37,6 @@ public class Repl {
             System.out.println(result);
         }
         System.out.println("Thank you for playing.");
-        server.stop();
+//        server.stop();
     }
 }
