@@ -2,13 +2,19 @@ package ui;
 
 import model.AuthData;
 import model.UserData;
+import requests.LoginRequest;
+import serverFacade.ResponseException;
 import serverFacade.ServerFacade;
 
-public class PreLoginClient {
+public class PreLoginClient implements Client{
     private final ServerFacade serverFacade;
-    public PreLoginClient(ServerFacade serverFacade){
+    private Repl repl;
+
+    public PreLoginClient(ServerFacade serverFacade, Repl repl){
         this.serverFacade = serverFacade;
+        this.repl = repl;
     }
+    @Override
     public String eval(String input){
         try{
             var tokens = input.split(" ");
@@ -18,12 +24,23 @@ public class PreLoginClient {
                     return "Type 'help' for command options";
                 }
                 case("login") -> {
-                    return "We'll log you in!";
+                    LoginRequest loginRequest = new LoginRequest(tokens[1],tokens[2]);
+                    try {
+                        String authToken = serverFacade.login(loginRequest).authToken();
+                        enterPostLoginUi(authToken);
+                        return "Login successful";
+                    } catch (ResponseException e) {
+                        return "Login failed. Try again";
+                    }
                 }
                 case("register") -> {
                     UserData userData = new UserData(tokens[1],tokens[2],tokens[3]);
                     AuthData authData = serverFacade.register(userData);
+                    enterPostLoginUi(authData.authToken());
                     return authData.toString();
+                }
+                case("quit") -> {
+                    return "quit";
                 }
                 default -> {
                     return "Unknown command. Try 'help' for options";
@@ -32,5 +49,8 @@ public class PreLoginClient {
         } catch (Exception e) {
             return e.getMessage();
         }
+    }
+    private void enterPostLoginUi(String authToken){
+        repl.setClient(new PostLoginClient(authToken));
     }
 }
