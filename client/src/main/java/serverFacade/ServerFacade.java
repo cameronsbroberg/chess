@@ -17,11 +17,16 @@ public class ServerFacade {
         this.serverUrl = serverUrl;
     }
 
+    public void clear(){
+        var request = buildRequest("DELETE","/db",null);
+        var response = sendRequest(request);
+        handleResponse(response, null);
+    }
+
     public AuthData register(UserData userData) throws Exception{
         var request = buildRequest("POST", "/user", userData);
         var response = sendRequest(request);
-        return new Gson().fromJson(response.body(),AuthData.class); //Don't know if this works
-//        return handleResponse(response, Pet.class);
+        return handleResponse(response, AuthData.class);
     };
 
     private HttpRequest buildRequest(String method, String path, Object body){
@@ -43,11 +48,31 @@ public class ServerFacade {
         }
     }
 
-    private HttpResponse<String> sendRequest(HttpRequest request) throws Exception {
+    private HttpResponse<String> sendRequest(HttpRequest request) throws ResponseException {
         try {
             return client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception ex) {
-            throw new Exception(ex.getMessage());
+            throw new ResponseException(ex.getMessage());
         }
+    }
+
+    private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ResponseException {
+        var status = response.statusCode();
+        if (!isSuccessful(status)) {
+            var body = response.body();
+            if (body != null) {
+                throw new ResponseException(body);
+            }
+            throw new ResponseException("other failure: " + status);
+        }
+
+        if (responseClass != null) {
+            return new Gson().fromJson(response.body(), responseClass);
+        }
+        return null;
+    }
+
+    private boolean isSuccessful(int status) {
+        return status / 100 == 2;
     }
 }
