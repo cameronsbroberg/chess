@@ -1,8 +1,10 @@
 package client;
 
+import chess.ChessGame;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
+import requests.CreateRequest;
 import requests.LoginRequest;
 import server.Server;
 import serverFacade.ResponseException;
@@ -89,5 +91,19 @@ public class ServerFacadeTests {
         logout();
         LoginRequest loginRequest = new LoginRequest("cameron","badPw");
         Assertions.assertThrows(ResponseException.class,()->serverFacade.login(loginRequest));
+    }
+    @Test
+    @DisplayName("Create a game")
+    public void createGame(){
+        UserData newUser = new UserData("cameron","pw","user@mail.byu.edu");
+        AuthData registerResponse = Assertions.assertDoesNotThrow(() -> serverFacade.register(newUser));
+        CreateRequest createRequest = new CreateRequest(registerResponse.authToken(),null,null,"First game",new ChessGame());
+        Assertions.assertDoesNotThrow(()->serverFacade.createGame(createRequest));
+    }
+    @Test
+    @DisplayName("Create game unauthorized")
+    public void createGameBadAuth(){
+        CreateRequest createRequest = new CreateRequest("badAuth",null,null,"First game",new ChessGame());
+        Assertions.assertThrows(ResponseException.class,()->serverFacade.createGame(createRequest));
     }
 }
