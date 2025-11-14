@@ -74,9 +74,13 @@ public class ServerFacade {
     }
 
     private HttpRequest.Builder baseRequest(String method, String path, Object body){
-        return HttpRequest.newBuilder()
+        var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
                 .method(method, makeRequestBody(body));
+        if(body != null) {
+            request.setHeader("Content-Type","application/json"); //What does this do?
+        }
+        return request;
     }
 //    private HttpRequest buildRequest(String method, String path, Object body){
 //        var request = HttpRequest.newBuilder()

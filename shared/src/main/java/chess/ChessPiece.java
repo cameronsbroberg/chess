@@ -75,48 +75,48 @@ public class ChessPiece {
             case WHITE -> {
                 switch(this.getPieceType()){
                     case KING -> {
-                        return " K  ";
+                        return " ♔ ";
                     }
                     case QUEEN -> {
-                        return " Q  ";
+                        return " ♕ ";
                     }
                     case BISHOP -> {
-                        return " B  ";
+                        return " ♗ ";
                     }
                     case KNIGHT -> {
-                        return " N  ";
+                        return " ♘ ";
                     }
                     case ROOK -> {
-                        return " R  ";
+                        return " ♖ ";
                     }
                     case PAWN -> {
-                        return " P  ";
+                        return " ♙ ";
                     }
                 }
             }
             case BLACK -> {
                 switch(this.getPieceType()){
                     case KING -> {
-                        return " k  ";
+                        return " ♚ ";
                     }
                     case QUEEN -> {
-                        return " q  ";
+                        return " ♛ ";
                     }
                     case BISHOP -> {
-                        return " b  ";
+                        return " ♝ ";
                     }
                     case KNIGHT -> {
-                        return " n  ";
+                        return " ♞ ";
                     }
                     case ROOK -> {
-                        return " r  ";
+                        return " ♜ ";
                     }
                     case PAWN -> {
-                        return " p  ";
+                        return " ♟ ";
                     }
                 }
             }
         }
-        return "NO PIECE TYPE";
+        return " \u2003 ";
     }
 }
