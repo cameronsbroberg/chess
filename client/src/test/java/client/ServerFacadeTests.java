@@ -3,6 +3,7 @@ package client;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
+import requests.LoginRequest;
 import server.Server;
 import serverFacade.ResponseException;
 import serverFacade.ServerFacade;
@@ -76,5 +77,17 @@ public class ServerFacadeTests {
         Assertions.assertDoesNotThrow(() -> serverFacade.logout(registerResponse.authToken()));
         Assertions.assertThrows(ResponseException.class,() -> serverFacade.logout(registerResponse.authToken()));
     }
-
+    @Test
+    @DisplayName("Login after logout")
+    public void login(){
+        logout();
+        Assertions.assertDoesNotThrow(()->serverFacade.login(new LoginRequest("cameron","pw")));
+    }
+    @Test
+    @DisplayName("Login with bad pw")
+    public void loginBad(){
+        logout();
+        LoginRequest loginRequest = new LoginRequest("cameron","badPw");
+        Assertions.assertThrows(ResponseException.class,()->serverFacade.login(loginRequest));
+    }
 }
