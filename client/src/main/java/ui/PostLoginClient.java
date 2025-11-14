@@ -12,6 +12,9 @@ import results.GameSummary;
 import serverFacade.ResponseException;
 import serverFacade.ServerFacade;
 
+import static ui.EscapeSequences.SET_TEXT_COLOR_BLACK;
+import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
+
 public class PostLoginClient extends Client {
     private String authToken;
     public PostLoginClient(ServerFacade serverFacade, Repl repl, String authToken){
@@ -20,13 +23,21 @@ public class PostLoginClient extends Client {
         this.authToken = authToken;
     }
     @Override
+    public String helpString(){
+        return SET_TEXT_COLOR_BLUE + "Logout " + SET_TEXT_COLOR_BLACK + "--- to exit\n" + SET_TEXT_COLOR_BLUE +
+                "Create " + SET_TEXT_COLOR_BLACK + "<GAME NAME>\n" + SET_TEXT_COLOR_BLUE +
+                "List" + SET_TEXT_COLOR_BLACK + "--- to get a list of games\n" + SET_TEXT_COLOR_BLUE +
+                "Join" + SET_TEXT_COLOR_BLACK + "<WHITE / BLACK> <GAME NUMBER>\n" + SET_TEXT_COLOR_BLUE +
+                "Observe" + SET_TEXT_COLOR_BLACK + "<GAME NUMBER>" + SET_TEXT_COLOR_BLUE;
+    }
+    @Override
     public String eval(String input) {
         try {
             var tokens = input.split(" ");
             String command = tokens[0].toLowerCase();
             switch (command) {
                 case ("help") -> {
-                    return "Type 'help' for command options";
+                    return helpString();
                 }
                 case ("logout") -> {
                     serverFacade.logout(authToken);

@@ -6,10 +6,17 @@ import requests.LoginRequest;
 import serverFacade.ResponseException;
 import serverFacade.ServerFacade;
 
+import static ui.EscapeSequences.*;
+
 public class PreLoginClient extends Client {
     public PreLoginClient(ServerFacade serverFacade, Repl repl){
         this.serverFacade = serverFacade;
         this.repl = repl;
+    }
+    public String helpString(){
+        return SET_TEXT_COLOR_BLUE + "Login " + SET_TEXT_COLOR_BLACK + "<USERNAME> <PASSWORD>\n" + SET_TEXT_COLOR_BLUE +
+                "Register " + SET_TEXT_COLOR_BLACK + "<USERNAME> <PASSWORD> <EMAIL>\n" + SET_TEXT_COLOR_BLUE +
+                "Quit " + SET_TEXT_COLOR_BLACK + "--- to exit the program" + SET_TEXT_COLOR_BLUE;
     }
     @Override
     public String eval(String input){
@@ -18,7 +25,7 @@ public class PreLoginClient extends Client {
             String command = tokens[0].toLowerCase();
             switch(command){
                 case("help") -> {
-                    return "Type 'help' for command options";
+                    return helpString();
                 }
                 case("login") -> {
                     LoginRequest loginRequest = new LoginRequest(tokens[1],tokens[2]);
