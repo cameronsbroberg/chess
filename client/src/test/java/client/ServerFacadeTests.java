@@ -4,6 +4,7 @@ import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
+import serverFacade.ResponseException;
 import serverFacade.ServerFacade;
 
 import java.net.URI;
@@ -23,31 +24,11 @@ public class ServerFacadeTests {
         System.out.println("Started test HTTP server on " + port);
         serverFacade = new ServerFacade("http://localhost:" + port);
         serverFacade.clear();
-//        var clearRequest = HttpRequest.newBuilder()
-//                .uri(URI.create("http://localhost:" + port + "/db"))
-//                .method("delete", null);
-//        clearRequest.build();
-//        serverFacade.client.send()
-
     }
 
     @AfterAll
     static void stopServer() {
         server.stop();
-//        var request = HttpRequest.newBuilder()
-//                .uri(URI.create(serverUrl + path))
-//                .method(method, makeRequestBody(body));
-//        if(body != null) {
-//            request.setHeader("Content-Type","application/json"); //What does this do?
-//        }
-//        return request.build();
-//        private HttpResponse<String> sendRequest(HttpRequest request) throws Exception {
-//            try {
-//                return client.send(request, HttpResponse.BodyHandlers.ofString());
-//            } catch (Exception ex) {
-//                throw new Exception(ex.getMessage());
-//            }
-//        }
     }
 
     @Test
@@ -60,7 +41,7 @@ public class ServerFacadeTests {
     public void register(){
         UserData newUser = new UserData("charlie","pw","email@byu.edu");
         AuthData registerResponse = Assertions.assertDoesNotThrow(() -> serverFacade.register(newUser));
-        Assertions.assertEquals(registerResponse.getClass(), AuthData.class);
+        Assertions.assertEquals(AuthData.class, registerResponse.getClass());
         Assertions.assertEquals("charlie",registerResponse.username());
     }
     @Test
@@ -68,6 +49,32 @@ public class ServerFacadeTests {
     public void registerBad(){
         UserData newUser = new UserData("cameron","pw","email@byu.edu");
         Assertions.assertDoesNotThrow(() -> serverFacade.register(newUser));
-        Assertions.assertThrows(Exception.class, () -> serverFacade.register(newUser));
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.register(newUser));
     }
+    @Test
+    @DisplayName("Fail to register incomplete data")
+    public void registerBadInput(){
+        UserData newUser = new UserData("cameron",null,null);
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.register(newUser));
+    }
+    @Test
+    @DisplayName("Logout a signed in user.")
+    public void logout(){
+        UserData newUser = new UserData("cameron","pw","user@mail.byu.edu");
+        AuthData registerResponse = Assertions.assertDoesNotThrow(() -> serverFacade.register(newUser));
+        Assertions.assertEquals(AuthData.class,registerResponse.getClass());
+        Assertions.assertEquals(String.class, registerResponse.authToken().getClass());
+        Assertions.assertDoesNotThrow(() -> serverFacade.logout(registerResponse.authToken()));
+    }
+    @Test
+    @DisplayName("Fail to logout a user twice.")
+    public void badLogout(){
+        UserData newUser = new UserData("cameron","pw","user@mail.byu.edu");
+        AuthData registerResponse = Assertions.assertDoesNotThrow(() -> serverFacade.register(newUser));
+        Assertions.assertEquals(AuthData.class,registerResponse.getClass());
+        Assertions.assertEquals(String.class, registerResponse.authToken().getClass());
+        Assertions.assertDoesNotThrow(() -> serverFacade.logout(registerResponse.authToken()));
+        Assertions.assertThrows(ResponseException.class,() -> serverFacade.logout(registerResponse.authToken()));
+    }
+
 }

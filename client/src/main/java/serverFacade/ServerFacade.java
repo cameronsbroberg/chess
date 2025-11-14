@@ -3,6 +3,9 @@ package serverFacade;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.UserData;
+import requests.CreateRequest;
+import requests.LoginRequest;
+import results.CreateResult;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -23,11 +26,33 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
-    public AuthData register(UserData userData) throws Exception{
+    public AuthData register(UserData userData) throws ResponseException{
         var request = buildRequest("POST", "/user", userData);
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     };
+
+    public AuthData login(LoginRequest loginRequest) throws ResponseException{
+        var request = buildRequest("POST", "/session", loginRequest);
+        var response = sendRequest(request);
+        return handleResponse(response, AuthData.class);
+    }
+
+    public void logout(String authToken) throws ResponseException{
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/session"))
+                .header("authorization",authToken)
+                .DELETE()
+                .build();
+        var response = sendRequest(request);
+        handleResponse(response, null);
+    }
+
+    public CreateResult createGame(CreateRequest createRequest) throws ResponseException{
+        var request = buildRequest("POST", "/game", createRequest);
+        var response = sendRequest(request);
+        return handleResponse(response, CreateResult.class);
+    }
 
     private HttpRequest buildRequest(String method, String path, Object body){
         var request = HttpRequest.newBuilder()
