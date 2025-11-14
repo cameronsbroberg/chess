@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import model.AuthData;
 import model.UserData;
 import requests.CreateRequest;
+import requests.JoinRequest;
 import requests.LoginRequest;
 import results.CreateResult;
+import results.GameListResult;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -54,6 +56,21 @@ public class ServerFacade {
                 .build();
         var response = sendRequest(request);
         return handleResponse(response, CreateResult.class);
+    }
+
+    public GameListResult listGames(String authToken) throws ResponseException{
+        var request = baseRequest("GET","/game",null)
+                .header("authorization",authToken)
+                .build();
+        var response = sendRequest(request);
+        return handleResponse(response, GameListResult.class);
+    }
+    public void joinGame(String authToken, JoinRequest joinRequest) throws ResponseException{
+        var request = baseRequest("PUT","/game",joinRequest)
+                .header("authorization",authToken)
+                .build();
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     private HttpRequest.Builder baseRequest(String method, String path, Object body){

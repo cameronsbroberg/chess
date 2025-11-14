@@ -5,7 +5,9 @@ import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import requests.CreateRequest;
+import requests.JoinRequest;
 import requests.LoginRequest;
+import results.CreateResult;
 import server.Server;
 import serverFacade.ResponseException;
 import serverFacade.ServerFacade;
@@ -105,5 +107,47 @@ public class ServerFacadeTests {
     public void createGameBadAuth(){
         CreateRequest createRequest = new CreateRequest("badAuth",null,null,"First game",new ChessGame());
         Assertions.assertThrows(ResponseException.class,()->serverFacade.createGame(createRequest));
+    }
+    @Test
+    @DisplayName("List games")
+    public void listGames(){
+        UserData newUser = new UserData("cameron","pw","user@mail.byu.edu");
+        AuthData registerResponse = Assertions.assertDoesNotThrow(() -> serverFacade.register(newUser));
+        CreateRequest createRequest = new CreateRequest(registerResponse.authToken(),null,null,"First game",new ChessGame());
+        Assertions.assertDoesNotThrow(()->serverFacade.createGame(createRequest));
+        Assertions.assertDoesNotThrow(()->serverFacade.listGames(registerResponse.authToken()));
+    }
+    @Test
+    @DisplayName("List games unauthorized")
+    public void listGamesBad(){
+        Assertions.assertThrows(ResponseException.class,()->serverFacade.listGames("badauth"));
+    }
+    @Test
+    @DisplayName("Join game")
+    public void joinGame(){
+        UserData newUser = new UserData("cameron","pw","user@mail.byu.edu");
+        AuthData registerResponse = Assertions.assertDoesNotThrow(() -> serverFacade.register(newUser));
+        CreateRequest createRequest = new CreateRequest(registerResponse.authToken(),null,null,"First game",new ChessGame());
+        CreateResult createResult = Assertions.assertDoesNotThrow(()->serverFacade.createGame(createRequest));
+        JoinRequest joinRequest = new JoinRequest(ChessGame.TeamColor.WHITE,createResult.gameID());
+        Assertions.assertDoesNotThrow(()->serverFacade.joinGame(registerResponse.authToken(),joinRequest));
+    }
+    @Test
+    @DisplayName("Join game unauthorized")
+    public void joinGameBad(){
+        UserData newUser = new UserData("cameron","pw","user@mail.byu.edu");
+        AuthData registerResponse = Assertions.assertDoesNotThrow(() -> serverFacade.register(newUser));
+        CreateRequest createRequest = new CreateRequest(registerResponse.authToken(),null,null,"First game",new ChessGame());
+        CreateResult createResult = Assertions.assertDoesNotThrow(()->serverFacade.createGame(createRequest));
+        JoinRequest joinRequest = new JoinRequest(ChessGame.TeamColor.WHITE,createResult.gameID());
+        Assertions.assertThrows(ResponseException.class,()->serverFacade.joinGame("badAuth",joinRequest));
+    }
+    @Test
+    @DisplayName("Join nonexistent game")
+    public void joinBadGame(){
+        UserData newUser = new UserData("cameron","pw","user@mail.byu.edu");
+        AuthData registerResponse = Assertions.assertDoesNotThrow(() -> serverFacade.register(newUser));
+        JoinRequest joinRequest = new JoinRequest(ChessGame.TeamColor.WHITE,1);
+        Assertions.assertThrows(ResponseException.class,()->serverFacade.joinGame("badAuth",joinRequest));
     }
 }
