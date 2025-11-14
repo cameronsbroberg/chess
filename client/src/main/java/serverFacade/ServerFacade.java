@@ -21,48 +21,55 @@ public class ServerFacade {
     }
 
     public void clear(){
-        var request = buildRequest("DELETE","/db",null);
+        var request = baseRequest("DELETE","/db",null).build();
         var response = sendRequest(request);
         handleResponse(response, null);
     }
 
     public AuthData register(UserData userData) throws ResponseException{
-        var request = buildRequest("POST", "/user", userData);
+        var request = baseRequest("POST","/user",userData)
+                .build();
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     };
 
     public AuthData login(LoginRequest loginRequest) throws ResponseException{
-        var request = buildRequest("POST", "/session", loginRequest);
+        var request = baseRequest("POST","/session",loginRequest)
+                .build();
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     }
 
     public void logout(String authToken) throws ResponseException{
-        var request = HttpRequest.newBuilder()
-                .uri(URI.create(serverUrl + "/session"))
+        var request = baseRequest("DELETE","/session",null)
                 .header("authorization",authToken)
-                .DELETE()
                 .build();
         var response = sendRequest(request);
         handleResponse(response, null);
     }
 
     public CreateResult createGame(CreateRequest createRequest) throws ResponseException{
-        var request = buildRequest("POST", "/game", createRequest);
+        var request = baseRequest("POST", "/game", createRequest)
+                .header("authorization",createRequest.authToken())
+                .build();
         var response = sendRequest(request);
         return handleResponse(response, CreateResult.class);
     }
 
-    private HttpRequest buildRequest(String method, String path, Object body){
-        var request = HttpRequest.newBuilder()
+    private HttpRequest.Builder baseRequest(String method, String path, Object body){
+        return HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
                 .method(method, makeRequestBody(body));
-        if(body != null) {
-            request.setHeader("Content-Type","application/json"); //What does this do?
-        }
-        return request.build();
-    };
+    }
+//    private HttpRequest buildRequest(String method, String path, Object body){
+//        var request = HttpRequest.newBuilder()
+//                .uri(URI.create(serverUrl + path))
+//                .method(method, makeRequestBody(body));
+//        if(body != null) {
+//            request.setHeader("Content-Type","application/json"); //What does this do?
+//        }
+//        return request.build();
+//    };
 
     private HttpRequest.BodyPublisher makeRequestBody(Object request) {
         if (request != null) {
