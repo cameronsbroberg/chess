@@ -31,8 +31,7 @@ public class PreLoginClient extends Client {
                     LoginRequest loginRequest = new LoginRequest(tokens[1],tokens[2]);
                     try {
                         String authToken = serverFacade.login(loginRequest).authToken();
-                        enterPostLoginUi(authToken);
-                        return "Login successful";
+                        return "Login successful" + enterPostLoginUi(authToken);
                     } catch (ResponseException e) {
                         return "Login failed. Try again";
                     }
@@ -40,8 +39,7 @@ public class PreLoginClient extends Client {
                 case("register") -> {
                     UserData userData = new UserData(tokens[1],tokens[2],tokens[3]);
                     AuthData authData = serverFacade.register(userData);
-                    enterPostLoginUi(authData.authToken());
-                    return authData.toString();
+                    return "Logged in successfully. Welcome, " + tokens[1] + enterPostLoginUi(authData.authToken());
                 }
                 case("quit") -> {
                     return "quit";
@@ -50,11 +48,19 @@ public class PreLoginClient extends Client {
                     return "Unknown command. Try 'help' for options";
                 }
             }
-        } catch (Exception e) {
+        } catch (IndexOutOfBoundsException e) {
+            return "Not enough arguments. Try the command again";
+        }
+        catch (ResponseException e) {
             return e.getMessage();
         }
+        catch (Exception e) {
+            return "Unknown error. Please try again";
+        }
     }
-    private void enterPostLoginUi(String authToken){
-        repl.setClient(new PostLoginClient(serverFacade,repl,authToken));
+    private String enterPostLoginUi(String authToken){
+        Client client = new PostLoginClient(serverFacade,repl,authToken);
+        repl.setClient(client);
+        return client.helpString();
     }
 }

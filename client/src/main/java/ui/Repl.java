@@ -34,6 +34,5 @@ public class Repl {
             System.out.println(result);
         }
         System.out.println("Thank you for playing.");
-//        server.stop();
     }
 }

@@ -82,15 +82,6 @@ public class ServerFacade {
         }
         return request;
     }
-//    private HttpRequest buildRequest(String method, String path, Object body){
-//        var request = HttpRequest.newBuilder()
-//                .uri(URI.create(serverUrl + path))
-//                .method(method, makeRequestBody(body));
-//        if(body != null) {
-//            request.setHeader("Content-Type","application/json"); //What does this do?
-//        }
-//        return request.build();
-//    };
 
     private HttpRequest.BodyPublisher makeRequestBody(Object request) {
         if (request != null) {
@@ -114,7 +105,8 @@ public class ServerFacade {
         if (!isSuccessful(status)) {
             var body = response.body();
             if (body != null) {
-                throw new ResponseException(body);
+                ErrorResponse errorResponse = new Gson().fromJson(body,ErrorResponse.class);
+                throw new ResponseException(errorResponse.message());
             }
             throw new ResponseException("other failure: " + status);
         }
