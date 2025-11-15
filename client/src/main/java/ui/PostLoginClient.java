@@ -29,7 +29,8 @@ public class PostLoginClient extends Client {
                 "Create " + SET_TEXT_COLOR_BLACK + "<GAME NAME>\n" + SET_TEXT_COLOR_BLUE +
                 "List " + SET_TEXT_COLOR_BLACK + "--- to get a list of games\n" + SET_TEXT_COLOR_BLUE +
                 "Join " + SET_TEXT_COLOR_BLACK + "<WHITE / BLACK> <GAME NUMBER>\n" + SET_TEXT_COLOR_BLUE +
-                "Observe " + SET_TEXT_COLOR_BLACK + "<GAME NUMBER>" + SET_TEXT_COLOR_BLUE;
+                "Observe " + SET_TEXT_COLOR_BLACK + "<GAME NUMBER>" + SET_TEXT_COLOR_BLUE +
+                "Help " + SET_TEXT_COLOR_BLACK + "--- to get a list of commands" + SET_TEXT_COLOR_BLUE;
     }
     private String chessBoard(ChessGame.TeamColor teamColor){
         String boardString = "";
@@ -192,7 +193,7 @@ public class PostLoginClient extends Client {
             return "Bad ID. Please try again";
         }
         catch (Exception e) {
-            return "Unkown error. Please try again";
+            return "Unknown error. Please try again";
         }
     }
     private String enterPreLoginUi(){
