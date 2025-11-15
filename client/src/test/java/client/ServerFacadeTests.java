@@ -9,12 +9,8 @@ import requests.JoinRequest;
 import requests.LoginRequest;
 import results.CreateResult;
 import server.Server;
-import serverFacade.ResponseException;
-import serverFacade.ServerFacade;
-
-import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import serverfacade.ResponseException;
+import serverfacade.ServerFacade;
 
 
 public class ServerFacadeTests {

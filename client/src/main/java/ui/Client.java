@@ -1,6 +1,6 @@
 package ui;
 
-import serverFacade.ServerFacade;
+import serverfacade.ServerFacade;
 
 public abstract class Client {
     protected ServerFacade serverFacade;

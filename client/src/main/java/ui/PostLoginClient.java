@@ -6,8 +6,8 @@ import requests.JoinRequest;
 import results.CreateResult;
 import results.GameListResult;
 import results.GameSummary;
-import serverFacade.ResponseException;
-import serverFacade.ServerFacade;
+import serverfacade.ResponseException;
+import serverfacade.ServerFacade;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package serverFacade;
+package serverfacade;
 
 public record ErrorResponse (String message){
 };

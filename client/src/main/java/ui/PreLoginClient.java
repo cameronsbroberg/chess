@@ -3,8 +3,8 @@ package ui;
 import model.AuthData;
 import model.UserData;
 import requests.LoginRequest;
-import serverFacade.ResponseException;
-import serverFacade.ServerFacade;
+import serverfacade.ResponseException;
+import serverfacade.ServerFacade;
 
 import static ui.EscapeSequences.*;
 
