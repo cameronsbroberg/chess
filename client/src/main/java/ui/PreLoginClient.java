@@ -39,7 +39,7 @@ public class PreLoginClient extends Client {
                 case("register") -> {
                     UserData userData = new UserData(tokens[1],tokens[2],tokens[3]);
                     AuthData authData = serverFacade.register(userData);
-                    return "Logged in successfully. Welcome, " + tokens[1] + enterPostLoginUi(authData.authToken());
+                    return "Logged in successfully. Welcome, " + tokens[1] + "\n" + enterPostLoginUi(authData.authToken());
                 }
                 case("quit") -> {
                     return "quit";

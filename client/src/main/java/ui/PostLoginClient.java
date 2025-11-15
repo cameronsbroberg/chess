@@ -147,7 +147,7 @@ public class PostLoginClient extends Client {
                 }
                 case ("logout") -> {
                     serverFacade.logout(authToken);
-                    return "Logged out successfully" + enterPreLoginUi();
+                    return "Logged out successfully\n" + enterPreLoginUi();
                 }
                 case ("create") -> {
                     CreateRequest createRequest = new CreateRequest(authToken,null,null,tokens[1],new ChessGame());
