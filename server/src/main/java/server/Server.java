@@ -3,6 +3,7 @@ package server;
 import dataaccess.*;
 import handler.GameHandler;
 import handler.UserHandler;
+import handler.WsHandler;
 import io.javalin.*;
 
 public class Server {
@@ -25,6 +26,7 @@ public class Server {
         }
         UserHandler userHandler = new UserHandler(userDAO, authDAO);
         GameHandler gameHandler = new GameHandler(userDAO, authDAO, gameDAO);
+        WsHandler wsHandler = new WsHandler(gameDAO);
         javalin.post("/user", userHandler::register);
         javalin.post("/session", userHandler::login);
         javalin.delete("/session", userHandler::logout);
@@ -32,6 +34,11 @@ public class Server {
         javalin.get("/game",gameHandler::list);
         javalin.put("/game",gameHandler::join);
         javalin.delete("/db",gameHandler::clear);
+        javalin.ws("/ws",ws -> {
+            ws.onConnect(wsHandler);
+            ws.onMessage(wsHandler);
+            ws.onClose(wsHandler);
+        });
     }
 
     public int run(int desiredPort) {

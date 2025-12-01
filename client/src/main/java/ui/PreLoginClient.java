@@ -16,7 +16,7 @@ public class PreLoginClient extends Client {
     public String helpString(){
         return SET_TEXT_COLOR_BLUE + "Login " + SET_TEXT_COLOR_BLACK + "<USERNAME> <PASSWORD>\n" + SET_TEXT_COLOR_BLUE +
                 "Register " + SET_TEXT_COLOR_BLACK + "<USERNAME> <PASSWORD> <EMAIL>\n" + SET_TEXT_COLOR_BLUE +
-                "Quit " + SET_TEXT_COLOR_BLACK + "--- to exit the program" + SET_TEXT_COLOR_BLUE +
+                "Quit " + SET_TEXT_COLOR_BLACK + "--- to exit the program\n" + SET_TEXT_COLOR_BLUE +
                 "Help " + SET_TEXT_COLOR_BLACK + "--- to get a list of commands" + SET_TEXT_COLOR_BLUE;
     }
     @Override
@@ -32,7 +32,7 @@ public class PreLoginClient extends Client {
                     LoginRequest loginRequest = new LoginRequest(tokens[1],tokens[2]);
                     try {
                         String authToken = serverFacade.login(loginRequest).authToken();
-                        return "Login successful" + enterPostLoginUi(authToken) + "\n";
+                        return "Login successful" + "\n" + enterPostLoginUi(authToken);
                     } catch (ResponseException e) {
                         return "Login failed. Try again";
                     }

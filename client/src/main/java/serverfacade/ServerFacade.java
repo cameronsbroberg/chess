@@ -17,6 +17,7 @@ import java.net.http.HttpResponse;
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
+    private WsFacade wsFacade;
 
     public ServerFacade(String serverUrl) {
         this.serverUrl = serverUrl;
@@ -71,6 +72,7 @@ public class ServerFacade {
                 .build();
         var response = sendRequest(request);
         handleResponse(response, null);
+        this.wsFacade = new WsFacade(serverUrl);
     }
 
     private HttpRequest.Builder baseRequest(String method, String path, Object body){
