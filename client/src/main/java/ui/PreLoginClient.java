@@ -18,7 +18,6 @@ public class PreLoginClient extends Client {
                 "Register " + SET_TEXT_COLOR_BLACK + "<USERNAME> <PASSWORD> <EMAIL>\n" + SET_TEXT_COLOR_BLUE +
                 "Quit " + SET_TEXT_COLOR_BLACK + "--- to exit the program" + SET_TEXT_COLOR_BLUE +
                 "Help " + SET_TEXT_COLOR_BLACK + "--- to get a list of commands" + SET_TEXT_COLOR_BLUE;
-
     }
     @Override
     public String eval(String input){
