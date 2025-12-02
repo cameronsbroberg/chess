@@ -12,11 +12,13 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
     /// a serializer
     /// exception handling with error codes.
     /// yeah maybe I guess
-    final private GameDAO gameDAO;
+    private final GameDAO gameDAO;
+    private final ConnectionManager connectionManager;
 
     public WsHandler(GameDAO gameDAO) {
         super();
         this.gameDAO = gameDAO;
+        this.connectionManager = new ConnectionManager();
     }
 
     @Override
@@ -31,6 +33,7 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
         UserGameCommand command = serializer.fromJson(ctx.message(), UserGameCommand.class);
         switch(command.getCommandType()){
             case CONNECT -> {
+                connectionManager.add(command.getGameID(),ctx.session);
                 ServerMessage loadGameMessage = new ServerMessage(
                         ServerMessage.ServerMessageType.LOAD_GAME,
                         new ChessGame());
