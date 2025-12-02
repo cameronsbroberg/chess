@@ -46,6 +46,9 @@ public class GameService {
         }
         return new GameListResult(gameList);
     }
+    public GameData getGame(int id) throws DataAccessException, BadRequestException{
+        return gameDAO.getGame(id);
+    }
 
     public CreateResult createGame(CreateRequest createRequest)
             throws BadRequestException,InvalidTokenException,DataAccessException {

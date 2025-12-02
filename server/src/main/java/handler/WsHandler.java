@@ -1,8 +1,11 @@
 package handler;
 
+import chess.ChessGame;
 import dataaccess.GameDAO;
 import io.javalin.websocket.*;
 import org.jetbrains.annotations.NotNull;
+import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
 public class WsHandler extends Handler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     /// TODO: Should this actually extend Handler? If it does, it gets:
@@ -25,7 +28,15 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
 
     @Override
     public void handleMessage(@NotNull WsMessageContext ctx) throws Exception {
-
+        UserGameCommand command = serializer.fromJson(ctx.message(), UserGameCommand.class);
+        ctx.send("AAAAAHHH!!!");
+        if(command.getCommandType() == UserGameCommand.CommandType.CONNECT){
+            ServerMessage loadGameMessage = new ServerMessage(
+                    ServerMessage.ServerMessageType.LOAD_GAME,
+                    new ChessGame());
+            String loadGameJson = serializer.toJson(loadGameMessage);
+            ctx.send(loadGameJson);
+        }
     }
 
     @Override

@@ -40,8 +40,8 @@ public class WebSocketTests {
 
         serverFacade = new TestServerFacade("localhost", port);
         serverFacade.clear();
-        environment = new WebsocketTestingEnvironment("localhost", port, "/ws", org.junit.jupiter.api.TestFactory.getGsonBuilder());
-        waitTime = TestFactory.getMessageTime();
+//        environment = new WebsocketTestingEnvironment("localhost", port, "/ws", org.junit.jupiter.api.TestFactory.getGsonBuilder());
+//        waitTime = TestFactory.getMessageTime();
     }
 
     @BeforeEach

@@ -21,6 +21,7 @@ public class ServerFacade {
 
     public ServerFacade(String serverUrl) {
         this.serverUrl = serverUrl;
+        this.wsFacade = new WsFacade(serverUrl);
     }
 
     public void clear(){
@@ -121,5 +122,9 @@ public class ServerFacade {
 
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
+    }
+
+    public WsFacade getWsFacade() {
+        return wsFacade;
     }
 }

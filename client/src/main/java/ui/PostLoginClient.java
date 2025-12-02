@@ -9,6 +9,7 @@ import results.GameSummary;
 import serverfacade.ResponseException;
 import serverfacade.ServerFacade;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -169,7 +170,7 @@ public class PostLoginClient extends Client {
                     int gameId = listedGames.get(Integer.parseInt(tokens[2]));
                     JoinRequest request = new JoinRequest(teamColor,gameId);
                     serverFacade.joinGame(authToken,request);
-                    return "Joined successfully" + "\n" + chessBoard(teamColor);
+                    return "Joined successfully" + "\n" + chessBoard(teamColor) + "\n" + enterInGameUi(gameId);
                 }
                 case ("observe") -> {
                     try {
@@ -198,6 +199,11 @@ public class PostLoginClient extends Client {
     }
     private String enterPreLoginUi(){
         Client client = new PreLoginClient(serverFacade,repl);
+        repl.setClient(client);
+        return client.helpString();
+    }
+    private String enterInGameUi(int gameId) throws IOException {
+        Client client = new InGameClient(serverFacade,repl,authToken,gameId);
         repl.setClient(client);
         return client.helpString();
     }
