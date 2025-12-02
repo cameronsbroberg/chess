@@ -29,13 +29,20 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
     @Override
     public void handleMessage(@NotNull WsMessageContext ctx) throws Exception {
         UserGameCommand command = serializer.fromJson(ctx.message(), UserGameCommand.class);
-        ctx.send("AAAAAHHH!!!");
-        if(command.getCommandType() == UserGameCommand.CommandType.CONNECT){
-            ServerMessage loadGameMessage = new ServerMessage(
-                    ServerMessage.ServerMessageType.LOAD_GAME,
-                    new ChessGame());
-            String loadGameJson = serializer.toJson(loadGameMessage);
-            ctx.send(loadGameJson);
+        switch(command.getCommandType()){
+            case CONNECT -> {
+                ServerMessage loadGameMessage = new ServerMessage(
+                        ServerMessage.ServerMessageType.LOAD_GAME,
+                        new ChessGame());
+                String loadGameJson = serializer.toJson(loadGameMessage);
+                ctx.send(loadGameJson);
+            }
+            case MAKE_MOVE -> {
+            }
+            case LEAVE -> {
+            }
+            case RESIGN -> {
+            }
         }
     }
 

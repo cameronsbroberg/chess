@@ -9,6 +9,9 @@ import websocket.commands.UserGameCommand;
 
 import java.io.IOException;
 
+import static ui.EscapeSequences.SET_TEXT_COLOR_BLACK;
+import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
+
 public class InGameClient extends Client{
     private WsFacade wsFacade;
     private String authToken;
@@ -33,7 +36,13 @@ public class InGameClient extends Client{
     }
     @Override
     String helpString() {
-        return "You are currently in a game!";
+        return SET_TEXT_COLOR_BLUE + "Redraw " + SET_TEXT_COLOR_BLACK + "--- to show the board again\n" +
+                SET_TEXT_COLOR_BLUE + "Leave " + SET_TEXT_COLOR_BLACK + "--- to leave the game\n" +
+                SET_TEXT_COLOR_BLUE + "Move " + SET_TEXT_COLOR_BLACK + "<STARTING ROW,COL>,<ENDING ROW,COL>\n" +
+                SET_TEXT_COLOR_BLUE + "Resign " + SET_TEXT_COLOR_BLACK + "--- to forfeit the game\n" +
+                SET_TEXT_COLOR_BLUE + "Highlight " + SET_TEXT_COLOR_BLACK + "<PIECE ROW>,<PIECE COL> --- to show legal moves\n" +
+                SET_TEXT_COLOR_BLUE + "Help " + SET_TEXT_COLOR_BLACK + "--- to get a list of commands" +
+                SET_TEXT_COLOR_BLUE;
     }
 
     @Override
