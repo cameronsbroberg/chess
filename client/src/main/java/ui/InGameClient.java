@@ -95,10 +95,8 @@ public class InGameClient extends Client{
 
     public void updateGame(ChessGame newGame){
         this.chessGame = newGame;
-        System.out.println("New ChessGame received!");
         System.out.println(chessBoard(this.teamColor));
-//        System.out.println(newGame.toString());
-//        System.out.println(this.chessGame.toString());
+        System.out.println(helpString() + "Type a command");
     }
 
     @Override
