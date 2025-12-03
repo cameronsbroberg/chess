@@ -27,13 +27,17 @@ public class WsFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    System.out.println("Received a message from websocket: " + message);
                     ServerMessage serverMessage = serializer.fromJson(message,ServerMessage.class);
-                    if(serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME){
-                        client.updateGame(serverMessage.getNewGame());
-                    }
-                    else{
-                        System.out.println("Received a message from server: " + message);
+                    switch(serverMessage.getServerMessageType()){
+                        case LOAD_GAME -> {
+                            client.updateGame(serverMessage.getNewGame());
+                        }
+                        case ERROR -> {
+                            System.out.println("Error!"); //FIXME: Shouldn't be printing to system in this class
+                        }
+                        case NOTIFICATION -> {
+                            System.out.println("Received a message from server: " + message);
+                        }
                     }
 //                    Notification notification = new Gson().fromJson(message, Notification.class);
 //                    notificationHandler.notify(notification);

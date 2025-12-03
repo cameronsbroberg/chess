@@ -1,6 +1,8 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import serverfacade.ResponseException;
 import serverfacade.ServerFacade;
@@ -9,31 +11,96 @@ import websocket.commands.UserGameCommand;
 
 import java.io.IOException;
 
-import static ui.EscapeSequences.SET_TEXT_COLOR_BLACK;
-import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
+import static ui.EscapeSequences.*;
 
 public class InGameClient extends Client{
     private WsFacade wsFacade;
     private String authToken;
     private int gameId;
     private ChessGame chessGame;
+    private ChessGame.TeamColor teamColor;
 
-    public InGameClient(ServerFacade serverFacade, Repl repl, String authToken, int gameId) throws IOException {
+    public InGameClient(ServerFacade serverFacade, Repl repl, String authToken, int gameId,ChessGame.TeamColor teamColor) throws IOException {
         this.wsFacade = serverFacade.getWsFacade();
         wsFacade.client = this; //FIXME this is bad
         this.repl = repl;
         this.authToken = authToken;
         this.gameId = gameId;
+        this.teamColor = teamColor;
         UserGameCommand connectCommand = new UserGameCommand(
                 UserGameCommand.CommandType.CONNECT,
                 authToken,
                 gameId);
         wsFacade.send(connectCommand);
     }
+
+    @Override
+    protected String whichPiece(int row, int col){
+        ChessPosition atPosition = new ChessPosition(row,col);
+        ChessPiece piece = chessGame.getBoard().getPiece(atPosition);
+        if(piece == null){
+            return EMPTY;
+        }
+        String pieceString = "";
+        switch(piece.getTeamColor()){
+            case WHITE -> {
+                pieceString = SET_TEXT_COLOR_WHITE;
+                switch(piece.getPieceType()){
+                    case KING -> {
+                        pieceString += WHITE_KING;
+                    }
+                    case QUEEN -> {
+                        pieceString += WHITE_QUEEN;
+                    }
+                    case BISHOP -> {
+                        pieceString += WHITE_BISHOP;
+                    }
+                    case KNIGHT -> {
+                        pieceString += WHITE_KNIGHT;
+                    }
+                    case ROOK -> {
+                        pieceString += WHITE_ROOK;
+                    }
+                    case PAWN -> {
+                        pieceString += WHITE_PAWN;
+                    }
+                }
+            }
+            case BLACK -> {
+                pieceString += SET_TEXT_COLOR_BLACK;
+                switch(piece.getPieceType()){
+                    case KING -> {
+                        pieceString += BLACK_KING;
+                    }
+                    case QUEEN -> {
+                        pieceString += BLACK_QUEEN;
+                    }
+                    case BISHOP -> {
+                        pieceString += BLACK_BISHOP;
+                    }
+                    case KNIGHT -> {
+                        pieceString += BLACK_KNIGHT;
+                    }
+                    case ROOK -> {
+                        pieceString += BLACK_ROOK;
+                    }
+                    case PAWN -> {
+                        pieceString += BLACK_PAWN;
+                    }
+                }
+            }
+        }
+        return pieceString;
+    }
+
     public void updateGame(ChessGame newGame){
         this.chessGame = newGame;
         System.out.println("New ChessGame received!");
+        System.out.println(chessBoard(this.teamColor));
+//        System.out.println(newGame.toString());
+//        System.out.println(this.chessGame.toString());
     }
+
     @Override
     String helpString() {
         return SET_TEXT_COLOR_BLUE + "Redraw " + SET_TEXT_COLOR_BLACK + "--- to show the board again\n" +

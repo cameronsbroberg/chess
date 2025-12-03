@@ -33,40 +33,8 @@ public class PostLoginClient extends Client {
                 "Observe " + SET_TEXT_COLOR_BLACK + "<GAME NUMBER>\n" + SET_TEXT_COLOR_BLUE +
                 "Help " + SET_TEXT_COLOR_BLACK + "--- to get a list of commands" + SET_TEXT_COLOR_BLUE;
     }
-    private String chessBoard(ChessGame.TeamColor teamColor){
-        String boardString = "";
-        boardString += horizontalBorder(teamColor);
-        int start = (teamColor == ChessGame.TeamColor.WHITE ? 8 : 1);
-        int end = (teamColor == ChessGame.TeamColor.WHITE ? 1 : 8);
-        int inc = (teamColor == ChessGame.TeamColor.WHITE ? -1 : 1);
-
-        for(int i = start; (inc < 0 ? i >= end : i <= end); i = i + inc){ //i is the row
-            boardString += SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + i + " ";
-            for (int j = 1; j <= 8; j++) { //j is the column
-                String background = ((i + j) % 2 == 0 ? SET_BG_COLOR_DARK_GREEN : SET_BG_COLOR_LIGHT_GREY);
-                boardString += background + " " + whichPiece(i,j) + " ";
-            }
-            boardString += SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + " " + i;
-            boardString += SET_BG_COLOR_WHITE + "\n";
-        }
-        boardString += horizontalBorder(teamColor);
-        return boardString;
-    }
-    private String horizontalBorder(ChessGame.TeamColor teamColor){
-        String lineString = SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + "  ";
-        if(teamColor == ChessGame.TeamColor.WHITE){
-            for(char c = 'A'; c <= 'H'; c++){
-                lineString += " " + c + " ";
-            }
-        }
-        else{
-            for(char c = 'H'; c >= 'A'; c--){
-                lineString += " " + c + " ";
-            }
-        }
-        return lineString + "\n";
-    }
-    private String whichPiece(int row, int col){
+    @Override
+    protected String whichPiece(int row, int col){
         switch(row){
             case(8) -> {
                 switch(col){
@@ -137,7 +105,6 @@ public class PostLoginClient extends Client {
         }
         return returnString;
     }
-
     @Override
     public String eval(String input) {
         try {
@@ -170,7 +137,7 @@ public class PostLoginClient extends Client {
                     int gameId = listedGames.get(Integer.parseInt(tokens[2]));
                     JoinRequest request = new JoinRequest(teamColor,gameId);
                     serverFacade.joinGame(authToken,request);
-                    return "Joined successfully" + "\n" + chessBoard(teamColor) + "\n" + enterInGameUi(gameId);
+                    return "Joined successfully" + "\n" + enterInGameUi(gameId,teamColor);
                 }
                 case ("observe") -> {
                     try {
@@ -202,9 +169,9 @@ public class PostLoginClient extends Client {
         repl.setClient(client);
         return client.helpString();
     }
-    private String enterInGameUi(int gameId) throws IOException {
-        Client client = new InGameClient(serverFacade,repl,authToken,gameId);
+    private String enterInGameUi(int gameId,ChessGame.TeamColor teamColor) throws IOException {
+        Client client = new InGameClient(serverFacade,repl,authToken,gameId,teamColor);
         repl.setClient(client);
-        return client.helpString();
+        return null;
     }
 }
