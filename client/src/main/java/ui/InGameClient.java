@@ -30,7 +30,9 @@ public class InGameClient extends Client{
         UserGameCommand connectCommand = new UserGameCommand(
                 UserGameCommand.CommandType.CONNECT,
                 authToken,
-                gameId);
+                gameId,
+                teamColor
+        );
         wsFacade.send(connectCommand);
     }
 
@@ -107,7 +109,7 @@ public class InGameClient extends Client{
                 SET_TEXT_COLOR_BLUE + "Resign " + SET_TEXT_COLOR_BLACK + "--- to forfeit the game\n" +
                 SET_TEXT_COLOR_BLUE + "Highlight " + SET_TEXT_COLOR_BLACK + "<PIECE ROW>,<PIECE COL> --- to show legal moves\n" +
                 SET_TEXT_COLOR_BLUE + "Help " + SET_TEXT_COLOR_BLACK + "--- to get a list of commands" +
-                SET_TEXT_COLOR_BLUE;
+                SET_TEXT_COLOR_BLUE + "\n";
     }
 
     @Override

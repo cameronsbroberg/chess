@@ -27,7 +27,6 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
 
     @Override
     public void handleConnect(@NotNull WsConnectContext ctx) throws Exception {
-        ctx.send("You have connected to Cam's server via websocket");
         ctx.enableAutomaticPings();
     }
 
@@ -43,9 +42,22 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
                 String loadGameJson = serializer.toJson(loadGameMessage);
                 ctx.send(loadGameJson);
                 String username = authDAO.getAuth(command.getAuthToken()).username();
+                ChessGame.TeamColor teamColor = command.getTeamColor();
+                String asWhat;
+                switch(teamColor){
+                    case WHITE -> {
+                        asWhat = "white";
+                    }
+                    case BLACK -> {
+                        asWhat = "black";
+                    }
+                    case null -> {
+                        asWhat = "an observer";
+                    }
+                }
                 ServerMessage joinMessage = new ServerMessage(
                         ServerMessage.ServerMessageType.NOTIFICATION,
-                        username + " has joined the game"
+                        username + " has joined the game as " + asWhat
                 );
                 String joinString = serializer.toJson(joinMessage);
                 connectionManager.broadcast(ctx.session,command.getGameID(),joinString);

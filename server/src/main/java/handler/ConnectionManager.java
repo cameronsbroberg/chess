@@ -11,25 +11,16 @@ public class ConnectionManager {
     public void add(int gameId, Session session){
         connections.putIfAbsent(gameId,ConcurrentHashMap.newKeySet());
         connections.get(gameId).add(session);
-//        Set<Session> existingSet = connections.get(gameId);
-//        if(existingSet == null){
-//            Set<Session> newSet = Set.of(session);
-//            connections.put(gameId, newSet);
-//        }
-//        else{
-//            existingSet.add(session);
-//            connections.replace(gameId,existingSet);
-//        }
     }
 
     public void remove(int gameId, Session session){
+
         Set<Session> existingSet = connections.get(gameId);
         if(existingSet == null){
             return; //TODO: Throw an error?
         }
         else{
-            existingSet.remove(session);
-            connections.replace(gameId,existingSet);
+            connections.get(gameId).remove(session);
         }
     }
 
@@ -39,6 +30,5 @@ public class ConnectionManager {
                 connection.getRemote().sendString(message);
             }
         }
-        //broadcast a message to all other clients involved in the game
     }
 }
