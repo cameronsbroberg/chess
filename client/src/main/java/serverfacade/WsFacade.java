@@ -9,7 +9,6 @@ import websocket.messages.ServerMessage;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
 
 public class WsFacade extends Endpoint {
 

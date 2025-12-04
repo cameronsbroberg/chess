@@ -1,6 +1,7 @@
 package handler;
 
 import chess.ChessGame;
+import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 import io.javalin.websocket.*;
 import org.jetbrains.annotations.NotNull;
@@ -14,11 +15,13 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
     /// exception handling with error codes.
     /// yeah maybe I guess
     private final GameDAO gameDAO;
+    private final AuthDAO authDAO;
     private final ConnectionManager connectionManager;
 
-    public WsHandler(GameDAO gameDAO) {
+    public WsHandler(GameDAO gameDAO, AuthDAO authDAO) {
         super();
         this.gameDAO = gameDAO;
+        this.authDAO = authDAO;
         this.connectionManager = new ConnectionManager();
     }
 
@@ -39,9 +42,10 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
                         new ChessGame());
                 String loadGameJson = serializer.toJson(loadGameMessage);
                 ctx.send(loadGameJson);
+                String username = authDAO.getAuth(command.getAuthToken()).username();
                 ServerMessage joinMessage = new ServerMessage(
                         ServerMessage.ServerMessageType.NOTIFICATION,
-                        "Someone has joined the game"
+                        username + " has joined the game"
                 );
                 String joinString = serializer.toJson(joinMessage);
                 connectionManager.broadcast(ctx.session,command.getGameID(),joinString);

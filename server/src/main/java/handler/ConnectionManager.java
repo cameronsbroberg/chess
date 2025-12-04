@@ -35,7 +35,7 @@ public class ConnectionManager {
 
     public void broadcast(Session excludeSession, int gameId, String message) throws IOException {
         for(Session connection : connections.get(gameId)){
-            if(connection.isOpen()){ // && !connection.equals(excludeSession)
+            if(connection.isOpen() && !connection.equals(excludeSession)){
                 connection.getRemote().sendString(message);
             }
         }

@@ -26,7 +26,7 @@ public class Server {
         }
         UserHandler userHandler = new UserHandler(userDAO, authDAO);
         GameHandler gameHandler = new GameHandler(userDAO, authDAO, gameDAO);
-        WsHandler wsHandler = new WsHandler(gameDAO);
+        WsHandler wsHandler = new WsHandler(gameDAO, authDAO);
         javalin.post("/user", userHandler::register);
         javalin.post("/session", userHandler::login);
         javalin.delete("/session", userHandler::logout);
