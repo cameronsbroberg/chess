@@ -2,6 +2,7 @@ package serverfacade;
 
 import com.google.gson.Gson;
 import jakarta.websocket.*;
+import org.w3c.dom.traversal.NodeIterator;
 import ui.InGameClient;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
@@ -14,11 +15,13 @@ public class WsFacade extends Endpoint {
 
     Session session;
     private Gson serializer;
-    public InGameClient client; //FIXME this is bad
+    private NotificationHandler notificationHandler;
+    private InGameClient client; //FIXME this is bad
 
-    public WsFacade(String url) throws ResponseException {
+    public WsFacade(String url, InGameClient client, NotificationHandler notifier) throws ResponseException {
         try {
             this.serializer = new Gson();
+            this.notificationHandler = notifier;
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
@@ -27,19 +30,7 @@ public class WsFacade extends Endpoint {
                 @Override
                 public void onMessage(String message) {
                     ServerMessage serverMessage = serializer.fromJson(message,ServerMessage.class);
-                    switch(serverMessage.getServerMessageType()){
-                        case LOAD_GAME -> {
-                            client.updateGame(serverMessage.getNewGame());
-                        }
-                        case ERROR -> {
-                            System.out.println("Error!"); //FIXME: Shouldn't be printing to system in this class
-                        }
-                        case NOTIFICATION -> {
-                            System.out.println("Received a message from server: " + message);
-                        }
-                    }
-//                    Notification notification = new Gson().fromJson(message, Notification.class);
-//                    notificationHandler.notify(notification);
+                    notificationHandler.handleNotification(serverMessage);
                 }
             });
         } catch (URISyntaxException | DeploymentException | IOException e) {

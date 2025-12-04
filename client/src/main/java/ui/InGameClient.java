@@ -4,6 +4,7 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import com.google.gson.Gson;
+import serverfacade.NotificationHandler;
 import serverfacade.ResponseException;
 import serverfacade.ServerFacade;
 import serverfacade.WsFacade;
@@ -14,15 +15,16 @@ import java.io.IOException;
 import static ui.EscapeSequences.*;
 
 public class InGameClient extends Client{
-    private WsFacade wsFacade;
-    private String authToken;
+    private final WsFacade wsFacade;
+    private final String authToken;
     private int gameId;
     private ChessGame chessGame;
-    private ChessGame.TeamColor teamColor;
+    private final ChessGame.TeamColor teamColor;
+    private final NotificationHandler notificationHandler;
 
     public InGameClient(ServerFacade serverFacade, Repl repl, String authToken, int gameId,ChessGame.TeamColor teamColor) throws IOException {
-        this.wsFacade = serverFacade.getWsFacade();
-        wsFacade.client = this; //FIXME this is bad
+        this.notificationHandler = new NotificationHandler(this);
+        this.wsFacade = new WsFacade(serverFacade.getServerUrl(), this,notificationHandler);
         this.repl = repl;
         this.authToken = authToken;
         this.gameId = gameId;

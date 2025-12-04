@@ -17,11 +17,13 @@ import java.net.http.HttpResponse;
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
-    private WsFacade wsFacade;
 
     public ServerFacade(String serverUrl) {
         this.serverUrl = serverUrl;
-        this.wsFacade = new WsFacade(serverUrl);
+    }
+
+    public String getServerUrl() {
+        return serverUrl;
     }
 
     public void clear(){
@@ -74,7 +76,6 @@ public class ServerFacade {
                 .build();
         var response = sendRequest(request);
         handleResponse(response, null);
-        this.wsFacade = new WsFacade(serverUrl);
     }
 
     private HttpRequest.Builder baseRequest(String method, String path, Object body){
@@ -125,7 +126,4 @@ public class ServerFacade {
         return status / 100 == 2;
     }
 
-    public WsFacade getWsFacade() {
-        return wsFacade;
-    }
 }
