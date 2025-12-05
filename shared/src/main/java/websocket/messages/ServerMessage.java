@@ -12,7 +12,7 @@ import java.util.Objects;
  */
 public class ServerMessage {
     ServerMessageType serverMessageType;
-    private ChessGame chessGame = null;
+    private ChessGame game = null;
     private String message = null;
 
     public enum ServerMessageType {
@@ -27,7 +27,7 @@ public class ServerMessage {
     }
     public ServerMessage(ServerMessageType type, ChessGame newGame){
         this.serverMessageType = type;
-        this.chessGame = newGame;
+        this.game = newGame;
     }
     public ServerMessageType getServerMessageType() {
         return this.serverMessageType;
@@ -38,7 +38,7 @@ public class ServerMessage {
     }
 
     public ChessGame getNewGame(){
-        return chessGame;
+        return game;
     }
 
     @Override
