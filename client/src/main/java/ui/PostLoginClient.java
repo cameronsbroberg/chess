@@ -173,6 +173,6 @@ public class PostLoginClient extends Client {
     private String enterInGameUi(int gameId,ChessGame.TeamColor teamColor) throws IOException {
         Client client = new InGameClient(serverFacade,repl,authToken,gameId,teamColor);
         repl.setClient(client);
-        return "";
+        return client.helpString();
     }
 }

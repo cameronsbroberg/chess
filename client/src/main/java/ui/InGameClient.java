@@ -21,6 +21,7 @@ public class InGameClient extends Client{
     private ChessGame chessGame;
     private final ChessGame.TeamColor teamColor;
     private final NotificationHandler notificationHandler;
+    private boolean promptedResign = false;
 
     public InGameClient(ServerFacade serverFacade, Repl repl, String authToken, int gameId,ChessGame.TeamColor teamColor) throws IOException {
         this.notificationHandler = new NotificationHandler(this);
@@ -100,8 +101,8 @@ public class InGameClient extends Client{
 
     public void updateGame(ChessGame newGame){
         this.chessGame = newGame;
-        System.out.println(chessBoard(this.teamColor) + "\n");
-        System.out.println(helpString() + "Type a command");
+        System.out.println(chessBoard(this.teamColor));
+        System.out.println("Type a command");
     }
 
     @Override
@@ -168,6 +169,9 @@ public class InGameClient extends Client{
         try{
             var tokens = input.split(" ");
             String command = tokens[0].toLowerCase();
+            if(!command.equals("resign")){
+                promptedResign = false;
+            }
             switch(command){
                 case("help") -> {
                     return helpString();
@@ -203,12 +207,23 @@ public class InGameClient extends Client{
                             chessMove
                     );
                     wsFacade.send(userGameCommand);
-                    return "Move sent";
+                    return "";
                 }
                 case("resign") -> {
                     if(teamColor == null){
                         return "Unknown command. Try 'help' for options";
                     }
+                    if(!promptedResign){
+                        promptedResign = true;
+                        return "Are you sure you want to resign? If so, type resign again";
+                    }
+                    UserGameCommand resignation = new UserGameCommand(
+                            UserGameCommand.CommandType.RESIGN,
+                            authToken,
+                            gameId,
+                            teamColor
+                    );
+                    wsFacade.send(resignation);
                     return "";
                 }
                 case("highlight") -> {
