@@ -31,4 +31,8 @@ public class ConnectionManager {
             }
         }
     }
+
+    public void clear(){
+        connections.clear();
+    }
 }

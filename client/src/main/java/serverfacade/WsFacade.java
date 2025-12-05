@@ -2,7 +2,6 @@ package serverfacade;
 
 import com.google.gson.Gson;
 import jakarta.websocket.*;
-import org.w3c.dom.traversal.NodeIterator;
 import ui.InGameClient;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
@@ -41,6 +40,14 @@ public class WsFacade extends Endpoint {
     public void send(UserGameCommand command) throws IOException {
         String message = serializer.toJson(command);
         session.getBasicRemote().sendText(message);
+    }
+
+    public void clear(){
+        try {
+            session.getBasicRemote().sendText("CLEAR");
+        } catch (IOException e) {
+            //Oh well, you tried
+        }
     }
 
     @Override

@@ -8,7 +8,7 @@ import serverfacade.NotificationHandler;
 import serverfacade.ResponseException;
 import serverfacade.ServerFacade;
 import serverfacade.WsFacade;
-import websocket.commands.UserGameCommand;
+import websocket.commands.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,8 +36,7 @@ public class InGameClient extends Client{
         UserGameCommand connectCommand = new UserGameCommand(
                 UserGameCommand.CommandType.CONNECT,
                 authToken,
-                gameId,
-                teamColor
+                gameId
         );
         wsFacade.send(connectCommand);
     }
@@ -218,8 +217,7 @@ public class InGameClient extends Client{
                     UserGameCommand userGameCommand = new UserGameCommand(
                             UserGameCommand.CommandType.LEAVE,
                             authToken,
-                            gameId,
-                            teamColor
+                            gameId
                     );
                     wsFacade.send(userGameCommand);
                     return enterPostLoginUi(authToken);
@@ -234,14 +232,12 @@ public class InGameClient extends Client{
                     } catch (IllegalArgumentException e) {
                         return "Invalid promotion piece. Use Queen, Rook, Bishop, or Knight";
                     }
-                    UserGameCommand userGameCommand = new UserGameCommand(
-                            UserGameCommand.CommandType.MAKE_MOVE,
+                    MoveCommand moveCommand = new MoveCommand(
                             authToken,
                             gameId,
-                            teamColor,
                             chessMove
                     );
-                    wsFacade.send(userGameCommand);
+                    wsFacade.send(moveCommand);
                     return "";
                 }
                 case("resign") -> {
@@ -255,8 +251,7 @@ public class InGameClient extends Client{
                     UserGameCommand resignation = new UserGameCommand(
                             UserGameCommand.CommandType.RESIGN,
                             authToken,
-                            gameId,
-                            teamColor
+                            gameId
                     );
                     wsFacade.send(resignation);
                     return "";

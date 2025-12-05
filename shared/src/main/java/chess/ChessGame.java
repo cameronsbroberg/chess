@@ -7,10 +7,12 @@ import java.util.Objects;
 public class ChessGame {
     private TeamColor teamTurn;
     private ChessBoard board;
+    private boolean isActive;
     public ChessGame() {
         setBoard(new ChessBoard());
         this.board.resetBoard();
         this.teamTurn = TeamColor.WHITE;
+        this.isActive = true;
     }
     public TeamColor getTeamTurn() {
         return teamTurn;
@@ -18,6 +20,15 @@ public class ChessGame {
     public void setTeamTurn(TeamColor team) {
         this.teamTurn = team;
     }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
     public enum TeamColor {
         WHITE,
         BLACK
@@ -42,6 +53,9 @@ public class ChessGame {
         return legalMoves;
     }
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if(!isActive){
+            throw new InvalidMoveException("Game is over");
+        }
         ChessPosition startPosition = move.getStartPosition();
         ChessPiece piece = board.getPiece(startPosition);
         if(piece == null){
@@ -59,6 +73,9 @@ public class ChessGame {
             setTeamTurn(TeamColor.BLACK);
         } else{
             setTeamTurn(TeamColor.WHITE);
+        }
+        if(isInCheckmate(teamTurn) || isInStalemate(teamTurn)){
+            isActive = false;
         }
     }
     private void executeMove(ChessMove move){

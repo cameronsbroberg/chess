@@ -33,7 +33,10 @@ public class Server {
         javalin.post("/game",gameHandler::create);
         javalin.get("/game",gameHandler::list);
         javalin.put("/game",gameHandler::join);
-        javalin.delete("/db",gameHandler::clear);
+        javalin.delete("/db", ctx -> {
+            gameHandler.clear(ctx);
+            wsHandler.clear();
+        });
         javalin.ws("/ws",ws -> {
             ws.onConnect(wsHandler);
             ws.onMessage(wsHandler);
