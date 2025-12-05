@@ -109,17 +109,58 @@ public class InGameClient extends Client{
         if(teamColor == null){
             return SET_TEXT_COLOR_BLUE + "Redraw " + SET_TEXT_COLOR_BLACK + "--- to show the board again\n" +
                     SET_TEXT_COLOR_BLUE + "Leave " + SET_TEXT_COLOR_BLACK + "--- to leave the game\n" +
-                    SET_TEXT_COLOR_BLUE + "Highlight " + SET_TEXT_COLOR_BLACK + "<PIECE ROW> <PIECE COL> --- to show legal moves\n" +
+                    SET_TEXT_COLOR_BLUE + "Highlight " + SET_TEXT_COLOR_BLACK + "<PIECE COL> <PIECE ROW> --- to show legal moves\n" +
                     SET_TEXT_COLOR_BLUE + "Help " + SET_TEXT_COLOR_BLACK + "--- to get a list of commands" +
                     SET_TEXT_COLOR_BLUE + "\n";
         }
         return SET_TEXT_COLOR_BLUE + "Redraw " + SET_TEXT_COLOR_BLACK + "--- to show the board again\n" +
                 SET_TEXT_COLOR_BLUE + "Leave " + SET_TEXT_COLOR_BLACK + "--- to leave the game\n" +
-                SET_TEXT_COLOR_BLUE + "Move " + SET_TEXT_COLOR_BLACK + "<STARTING ROW,COL> <ENDING ROW,COL> <PROMOTION PIECE> \n" +
+                SET_TEXT_COLOR_BLUE + "Move " + SET_TEXT_COLOR_BLACK + "<STARTING COL ROW> <ENDING COL ROW> <PROMOTION PIECE (if needed)> \n" +
                 SET_TEXT_COLOR_BLUE + "Resign " + SET_TEXT_COLOR_BLACK + "--- to forfeit the game\n" +
                 SET_TEXT_COLOR_BLUE + "Highlight " + SET_TEXT_COLOR_BLACK + "<PIECE ROW> <PIECE COL> --- to show legal moves\n" +
                 SET_TEXT_COLOR_BLUE + "Help " + SET_TEXT_COLOR_BLACK + "--- to get a list of commands" +
                 SET_TEXT_COLOR_BLUE + "\n";
+    }
+
+    private ChessMove parseMove(String[] tokens) throws IllegalArgumentException {
+        String startPos = tokens[1];
+        String endPos = tokens[2];
+        int startCol;
+        switch(Character.toUpperCase(startPos.charAt(0))){
+            case('A') -> startCol = 1;
+            case('B') -> startCol = 2;
+            case('C') -> startCol = 3;
+            case('D') -> startCol = 4;
+            case('E') -> startCol = 5;
+            case('F') -> startCol = 6;
+            case('G') -> startCol = 7;
+            case('H') -> startCol = 8;
+            default -> throw new IllegalArgumentException();
+        }
+        int startRow = Integer.parseInt(String.valueOf(startPos.charAt(1)));
+        int endCol;
+        switch(Character.toUpperCase(endPos.charAt(0))){
+            case('A') -> endCol = 1;
+            case('B') -> endCol = 2;
+            case('C') -> endCol = 3;
+            case('D') -> endCol = 4;
+            case('E') -> endCol = 5;
+            case('F') -> endCol = 6;
+            case('G') -> endCol = 7;
+            case('H') -> endCol = 8;
+            default -> throw new IllegalArgumentException();
+        }
+        int endRow = Integer.parseInt(String.valueOf(endPos.charAt(1)));
+
+        ChessPiece.PieceType promotionPiece = null;
+        if(tokens.length >= 4){
+            promotionPiece = ChessPiece.PieceType.valueOf(tokens[3].toUpperCase());
+        }
+        return new ChessMove(
+                new ChessPosition(startRow,startCol),
+                new ChessPosition(endRow,endCol),
+                promotionPiece
+        );
     }
 
     @Override
@@ -148,23 +189,12 @@ public class InGameClient extends Client{
                     if(teamColor == null){
                         return "Unknown command. Try 'help' for options";
                     }
-                    int startRow = Integer.parseInt(tokens[1]);
-                    int startCol = Integer.parseInt(tokens[2]);
-                    int endRow = Integer.parseInt(tokens[3]);
-                    int endCol = Integer.parseInt(tokens[4]);
-                    ChessPiece.PieceType promotionPiece = null;
-                    if(tokens.length >= 6){
-                        try {
-                            promotionPiece = ChessPiece.PieceType.valueOf(tokens[5].toUpperCase());
-                        } catch (IllegalArgumentException e) {
-                            return "Invalid promotion piece. Use Queen, Rook, Bishop, or Knight";
-                        }
+                    ChessMove chessMove = null;
+                    try {
+                        chessMove = parseMove(tokens);
+                    } catch (IllegalArgumentException e) {
+                        return "Invalid promotion piece. Use Queen, Rook, Bishop, or Knight";
                     }
-                    ChessMove chessMove = new ChessMove(
-                            new ChessPosition(startRow,startCol),
-                            new ChessPosition(endRow,endCol),
-                            promotionPiece
-                    );
                     UserGameCommand userGameCommand = new UserGameCommand(
                             UserGameCommand.CommandType.MAKE_MOVE,
                             authToken,
