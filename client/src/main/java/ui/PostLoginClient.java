@@ -159,7 +159,7 @@ public class PostLoginClient extends Client {
             return e.getMessage();
         }
         catch (NullPointerException e){
-            return "Bad ID. Please try again" + e.getMessage();
+            return "Bad ID. Please try again";
         }
         catch (Exception e) {
             return "Unknown error. Please try again";

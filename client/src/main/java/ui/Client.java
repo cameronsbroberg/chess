@@ -12,6 +12,9 @@ public abstract class Client {
     abstract String eval(String input);
     abstract String helpString();
     protected String chessBoard(ChessGame.TeamColor teamColor){
+        if(teamColor == null){
+            teamColor = ChessGame.TeamColor.WHITE; //Show white side if observer
+        }
         String boardString = "";
         boardString += horizontalBorder(teamColor);
         int row_start = (teamColor == ChessGame.TeamColor.WHITE ? 8 : 1);

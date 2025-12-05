@@ -1,6 +1,7 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import serverfacade.NotificationHandler;
@@ -105,11 +106,18 @@ public class InGameClient extends Client{
 
     @Override
     String helpString() {
+        if(teamColor == null){
+            return SET_TEXT_COLOR_BLUE + "Redraw " + SET_TEXT_COLOR_BLACK + "--- to show the board again\n" +
+                    SET_TEXT_COLOR_BLUE + "Leave " + SET_TEXT_COLOR_BLACK + "--- to leave the game\n" +
+                    SET_TEXT_COLOR_BLUE + "Highlight " + SET_TEXT_COLOR_BLACK + "<PIECE ROW> <PIECE COL> --- to show legal moves\n" +
+                    SET_TEXT_COLOR_BLUE + "Help " + SET_TEXT_COLOR_BLACK + "--- to get a list of commands" +
+                    SET_TEXT_COLOR_BLUE + "\n";
+        }
         return SET_TEXT_COLOR_BLUE + "Redraw " + SET_TEXT_COLOR_BLACK + "--- to show the board again\n" +
                 SET_TEXT_COLOR_BLUE + "Leave " + SET_TEXT_COLOR_BLACK + "--- to leave the game\n" +
-                SET_TEXT_COLOR_BLUE + "Move " + SET_TEXT_COLOR_BLACK + "<STARTING ROW,COL>,<ENDING ROW,COL>\n" +
+                SET_TEXT_COLOR_BLUE + "Move " + SET_TEXT_COLOR_BLACK + "<STARTING ROW,COL> <ENDING ROW,COL> <PROMOTION PIECE> \n" +
                 SET_TEXT_COLOR_BLUE + "Resign " + SET_TEXT_COLOR_BLACK + "--- to forfeit the game\n" +
-                SET_TEXT_COLOR_BLUE + "Highlight " + SET_TEXT_COLOR_BLACK + "<PIECE ROW>,<PIECE COL> --- to show legal moves\n" +
+                SET_TEXT_COLOR_BLUE + "Highlight " + SET_TEXT_COLOR_BLACK + "<PIECE ROW> <PIECE COL> --- to show legal moves\n" +
                 SET_TEXT_COLOR_BLUE + "Help " + SET_TEXT_COLOR_BLACK + "--- to get a list of commands" +
                 SET_TEXT_COLOR_BLUE + "\n";
     }
@@ -137,9 +145,40 @@ public class InGameClient extends Client{
                     return enterPostLoginUi(authToken);
                 }
                 case("move") -> {
-                    return "";
+                    if(teamColor == null){
+                        return "Unknown command. Try 'help' for options";
+                    }
+                    int startRow = Integer.parseInt(tokens[1]);
+                    int startCol = Integer.parseInt(tokens[2]);
+                    int endRow = Integer.parseInt(tokens[3]);
+                    int endCol = Integer.parseInt(tokens[4]);
+                    ChessPiece.PieceType promotionPiece = null;
+                    if(tokens.length >= 6){
+                        try {
+                            promotionPiece = ChessPiece.PieceType.valueOf(tokens[5].toUpperCase());
+                        } catch (IllegalArgumentException e) {
+                            return "Invalid promotion piece. Use Queen, Rook, Bishop, or Knight";
+                        }
+                    }
+                    ChessMove chessMove = new ChessMove(
+                            new ChessPosition(startRow,startCol),
+                            new ChessPosition(endRow,endCol),
+                            promotionPiece
+                    );
+                    UserGameCommand userGameCommand = new UserGameCommand(
+                            UserGameCommand.CommandType.MAKE_MOVE,
+                            authToken,
+                            gameId,
+                            teamColor,
+                            chessMove
+                    );
+                    wsFacade.send(userGameCommand);
+                    return "Move sent";
                 }
                 case("resign") -> {
+                    if(teamColor == null){
+                        return "Unknown command. Try 'help' for options";
+                    }
                     return "";
                 }
                 case("highlight") -> {

@@ -16,7 +16,7 @@ public class WsFacade extends Endpoint {
     Session session;
     private Gson serializer;
     private NotificationHandler notificationHandler;
-    private InGameClient client; //FIXME this is bad
+    private InGameClient client;
 
     public WsFacade(String url, InGameClient client, NotificationHandler notifier) throws ResponseException {
         try {

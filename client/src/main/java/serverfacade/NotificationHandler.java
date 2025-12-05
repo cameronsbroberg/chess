@@ -13,7 +13,7 @@ public class NotificationHandler {
     public void handleNotification(ServerMessage serverMessage){
         switch(serverMessage.getServerMessageType()){
             case LOAD_GAME -> client.updateGame(serverMessage.getNewGame());
-            case ERROR -> System.out.println("Error!");
+            case ERROR -> System.out.println("Error: " + serverMessage.getMessage());
             case NOTIFICATION -> System.out.println(serverMessage.getMessage());
         }
     }
