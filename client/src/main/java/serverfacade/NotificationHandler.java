@@ -1,7 +1,7 @@
 package serverfacade;
 
 import ui.InGameClient;
-import websocket.messages.ServerMessage;
+import websocket.messages.*;
 
 public class NotificationHandler {
     private final InGameClient client;
@@ -11,10 +11,11 @@ public class NotificationHandler {
     }
 
     public void handleNotification(ServerMessage serverMessage){
-        switch(serverMessage.getServerMessageType()){
-            case LOAD_GAME -> client.updateGame(serverMessage.getNewGame());
-            case ERROR -> System.out.println("Error: " + serverMessage.getMessage());
-            case NOTIFICATION -> System.out.println(serverMessage.getMessage());
+        switch(serverMessage){
+            case LoadGameMessage loadGameMessage -> client.updateGame(((LoadGameMessage) serverMessage).getGame());
+            case ErrorMessage errorMessage -> System.out.println("Error: " + ((ErrorMessage) serverMessage).getErrorMessage());
+            case Notification notification -> System.out.println(((Notification) serverMessage).getMessage());
+            default -> System.out.println("The server has gone mad and sent an impossible message.");
         }
     }
 }

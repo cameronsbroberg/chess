@@ -18,8 +18,6 @@ public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
 
-    private WsFacade wsFacade = null;
-
     public ServerFacade(String serverUrl) {
         this.serverUrl = serverUrl;
     }
@@ -32,9 +30,6 @@ public class ServerFacade {
         var request = baseRequest("DELETE","/db",null).build();
         var response = sendRequest(request);
         handleResponse(response, null);
-        if (wsFacade != null){
-            wsFacade.clear();
-        }
     }
 
     public AuthData register(UserData userData) throws ResponseException{
@@ -129,9 +124,5 @@ public class ServerFacade {
 
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
-    }
-
-    public void setWsFacade(WsFacade wsFacade) {
-        this.wsFacade = wsFacade;
     }
 }
