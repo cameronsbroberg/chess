@@ -1,6 +1,8 @@
 package handler;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import chess.InvalidMoveException;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
@@ -95,16 +97,10 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
             ctx.send(error);
             return;
         }
-//        if(game.isInCheckmate(command.getTeamColor()) || game.isInStalemate(command.getTeamColor())){
-//            String error = serializer.toJson(new ServerMessage(
-//                    ServerMessage.ServerMessageType.ERROR,
-//                    "Game is over. No moves allowed."
-//            ));
-//            ctx.send(error);
-//            return;
-//        }
+
+        ChessMove move = command.getChessMove();
         try {
-            game.makeMove(command.getChessMove());
+            game.makeMove(move);
         }
         catch (InvalidMoveException e) {
             String error = serializer.toJson(new ServerMessage(
@@ -129,9 +125,17 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
         String loadGameJson = serializer.toJson(loadGameMessage);
         connectionManager.broadcast(null,command.getGameID(),loadGameJson);
 
+        String username = authDAO.getAuth(command.getAuthToken()).username();
+        String moveMessage = serializer.toJson(new ServerMessage(
+                ServerMessage.ServerMessageType.NOTIFICATION,
+                username + " moved from " +
+                        parsePosition(move.getStartPosition()) + " to " +
+                        parsePosition(move.getEndPosition())
+        ));
+        connectionManager.broadcast(ctx.session, command.getGameID(), moveMessage);
+
         ChessGame.TeamColor otherPlayer = (command.getTeamColor() == ChessGame.TeamColor.WHITE ?
                 ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE);
-        String username = authDAO.getAuth(command.getAuthToken()).username();
         if (game.isInCheckmate(otherPlayer)) {
             String gameOver = serializer.toJson(new ServerMessage(
                     ServerMessage.ServerMessageType.NOTIFICATION,
@@ -152,7 +156,6 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
                     "Check!"
             ));
             connectionManager.broadcast(ctx.session, command.getGameID(),check); //TODO: double check the specs for exclude
-
         }
         //try to execute the move
         //send an error if it's not valid for any reason
@@ -207,6 +210,22 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
                 username + " has resigned. Game over."
         ));
         connectionManager.broadcast(null,command.getGameID(),resignation);
+    }
+
+    private String parsePosition(ChessPosition position){
+        String row = String.valueOf(position.getRow());
+        String col = "";
+        switch(position.getColumn()){
+            case(1) -> col = "a";
+            case(2) -> col = "b";
+            case(3) -> col = "c";
+            case(4) -> col = "d";
+            case(5) -> col = "e";
+            case(6) -> col = "f";
+            case(7) -> col = "g";
+            case(8) -> col = "h";
+        }
+        return row + col;
     }
     @Override
     public void handleClose(@NotNull WsCloseContext ctx) throws Exception {

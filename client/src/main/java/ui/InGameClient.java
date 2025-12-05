@@ -124,44 +124,32 @@ public class InGameClient extends Client{
     }
 
     private ChessMove parseMove(String[] tokens) throws IllegalArgumentException {
-        String startPos = tokens[1];
-        String endPos = tokens[2];
-        int startCol;
-        switch(Character.toUpperCase(startPos.charAt(0))){
-            case('A') -> startCol = 1;
-            case('B') -> startCol = 2;
-            case('C') -> startCol = 3;
-            case('D') -> startCol = 4;
-            case('E') -> startCol = 5;
-            case('F') -> startCol = 6;
-            case('G') -> startCol = 7;
-            case('H') -> startCol = 8;
-            default -> throw new IllegalArgumentException();
-        }
-        int startRow = Integer.parseInt(String.valueOf(startPos.charAt(1)));
-        int endCol;
-        switch(Character.toUpperCase(endPos.charAt(0))){
-            case('A') -> endCol = 1;
-            case('B') -> endCol = 2;
-            case('C') -> endCol = 3;
-            case('D') -> endCol = 4;
-            case('E') -> endCol = 5;
-            case('F') -> endCol = 6;
-            case('G') -> endCol = 7;
-            case('H') -> endCol = 8;
-            default -> throw new IllegalArgumentException();
-        }
-        int endRow = Integer.parseInt(String.valueOf(endPos.charAt(1)));
-
         ChessPiece.PieceType promotionPiece = null;
         if(tokens.length >= 4){
             promotionPiece = ChessPiece.PieceType.valueOf(tokens[3].toUpperCase());
         }
         return new ChessMove(
-                new ChessPosition(startRow,startCol),
-                new ChessPosition(endRow,endCol),
+                parsePosition(tokens[1]),
+                parsePosition(tokens[2]),
                 promotionPiece
         );
+    }
+
+    private ChessPosition parsePosition (String token){
+        int row = Integer.parseInt(String.valueOf(token.charAt(1)));
+        int col;
+        switch(Character.toUpperCase(token.charAt(0))){
+            case('A') -> col = 1;
+            case('B') -> col = 2;
+            case('C') -> col = 3;
+            case('D') -> col = 4;
+            case('E') -> col = 5;
+            case('F') -> col = 6;
+            case('G') -> col = 7;
+            case('H') -> col = 8;
+            default -> throw new IllegalArgumentException();
+        }
+        return new ChessPosition(row,col);
     }
 
     @Override
@@ -227,6 +215,8 @@ public class InGameClient extends Client{
                     return "";
                 }
                 case("highlight") -> {
+                    ChessPosition piecePosition = parsePosition(tokens[1]);
+
                     return "";
                 }
                 default -> {
