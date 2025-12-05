@@ -155,6 +155,9 @@ public class InGameClient extends Client{
     }
 
     private String highlightBoard(ChessPosition highlightPiece, ChessGame.TeamColor teamColor){
+        if (chessGame.validMoves(highlightPiece) == null){
+            return chessBoard(teamColor) + "No piece at selected square";
+        }
         Collection<ChessMove> validMoves = chessGame.validMoves(highlightPiece);
         Collection<ChessPosition> highlightSpots = new ArrayList<>();
         for(ChessMove move : validMoves){
@@ -182,10 +185,10 @@ public class InGameClient extends Client{
                 String background = ((i + j) % 2 == 0 ? SET_BG_COLOR_DARK_GREEN : SET_BG_COLOR_LIGHT_GREY);
                 ChessPosition here = new ChessPosition(i,j);
                 if(here.equals(highlightPiece)){
-                    background = SET_BG_COLOR_YELLOW;
+                    background = SET_BG_COLOR_DARK_YELLOW;
                 }
                 else if(highlightSpots.contains(here)){
-                    background = SET_BG_COLOR_YELLOW;
+                    background = ((i + j) % 2 == 0 ? SET_BG_COLOR_DARK_BLUE : SET_BG_COLOR_MEDIUM_BLUE);
                 }
                 boardString += background + " " + whichPiece(i,j) + " ";
             }
