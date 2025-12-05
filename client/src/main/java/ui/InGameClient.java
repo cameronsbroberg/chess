@@ -11,6 +11,8 @@ import serverfacade.WsFacade;
 import websocket.commands.UserGameCommand;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static ui.EscapeSequences.*;
 
@@ -152,6 +154,48 @@ public class InGameClient extends Client{
         return new ChessPosition(row,col);
     }
 
+    private String highlightBoard(ChessPosition highlightPiece, ChessGame.TeamColor teamColor){
+        Collection<ChessMove> validMoves = chessGame.validMoves(highlightPiece);
+        Collection<ChessPosition> highlightSpots = new ArrayList<>();
+        for(ChessMove move : validMoves){
+            highlightSpots.add(move.getEndPosition());
+        }
+
+        if(teamColor == null){
+            teamColor = ChessGame.TeamColor.WHITE; //Show white side if observer
+        }
+        String boardString = "";
+        boardString += horizontalBorder(teamColor);
+        int row_start = (teamColor == ChessGame.TeamColor.WHITE ? 8 : 1);
+        int row_end = (teamColor == ChessGame.TeamColor.WHITE ? 1 : 8);
+
+        int row_inc = (teamColor == ChessGame.TeamColor.WHITE ? -1 : 1);
+
+        int col_start = (teamColor == ChessGame.TeamColor.WHITE ? 1 : 8);
+        int col_end = (teamColor == ChessGame.TeamColor.WHITE ? 8 : 1);
+
+        int col_inc = (teamColor == ChessGame.TeamColor.WHITE ? 1 : -1);
+
+        for(int i = row_start; (row_inc < 0 ? i >= row_end : i <= row_end); i = i + row_inc){ //i is the row
+            boardString += SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + i + " ";
+            for (int j = col_start; (col_inc < 0 ? j >= col_end : j <= col_end); j = j + col_inc) { //j is the column
+                String background = ((i + j) % 2 == 0 ? SET_BG_COLOR_DARK_GREEN : SET_BG_COLOR_LIGHT_GREY);
+                ChessPosition here = new ChessPosition(i,j);
+                if(here.equals(highlightPiece)){
+                    background = SET_BG_COLOR_YELLOW;
+                }
+                else if(highlightSpots.contains(here)){
+                    background = SET_BG_COLOR_YELLOW;
+                }
+                boardString += background + " " + whichPiece(i,j) + " ";
+            }
+            boardString += SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + " " + i;
+            boardString += SET_BG_COLOR_WHITE + "\n";
+        }
+        boardString += horizontalBorder(teamColor);
+        return boardString;
+    }
+
     @Override
     String eval(String input) {
         try{
@@ -216,8 +260,7 @@ public class InGameClient extends Client{
                 }
                 case("highlight") -> {
                     ChessPosition piecePosition = parsePosition(tokens[1]);
-
-                    return "";
+                    return highlightBoard(piecePosition,teamColor);
                 }
                 default -> {
                     return "Unknown command. Try 'help' for options";
