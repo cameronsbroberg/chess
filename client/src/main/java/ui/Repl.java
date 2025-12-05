@@ -21,7 +21,7 @@ public class Repl {
         System.out.println(client.helpString());
         var result = "";
         while(!result.equals("quit")){
-            System.out.println("Type a command");
+            System.out.println(SET_TEXT_COLOR_BLUE + "Type a command");
             Scanner scanner = new Scanner(System.in);
             String line = scanner.nextLine();
             result = client.eval(line);

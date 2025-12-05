@@ -16,7 +16,7 @@ import java.util.Map;
 import static ui.EscapeSequences.*;
 
 public class PostLoginClient extends Client {
-    private String authToken;
+    private final String authToken;
     private Map<Integer, Integer> listedGames;
     public PostLoginClient(ServerFacade serverFacade, Repl repl, String authToken){
         this.serverFacade = serverFacade;
@@ -140,12 +140,13 @@ public class PostLoginClient extends Client {
                     return "Joined successfully" + "\n" + enterInGameUi(gameId,teamColor);
                 }
                 case ("observe") -> {
+                    int gameId;
                     try {
-                        int gameId = listedGames.get(Integer.parseInt(tokens[1]));
+                        gameId = listedGames.get(Integer.parseInt(tokens[1]));
+                        return "Observing game\n" + enterInGameUi(gameId,null);
                     } catch (Exception e) {
-                        throw new RuntimeException(e);
+                        throw new RuntimeException(e); //FIXME do something better than this
                     }
-                    return "Observing game\n" + chessBoard(ChessGame.TeamColor.WHITE);
                 }
                 default -> {
                     return "Unknown command. Try 'help' for options";
@@ -158,7 +159,7 @@ public class PostLoginClient extends Client {
             return e.getMessage();
         }
         catch (NullPointerException e){
-            return "Bad ID. Please try again";
+            return "Bad ID. Please try again" + e.getMessage();
         }
         catch (Exception e) {
             return "Unknown error. Please try again";

@@ -3,7 +3,6 @@ package ui;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
-import com.google.gson.Gson;
 import serverfacade.NotificationHandler;
 import serverfacade.ResponseException;
 import serverfacade.ServerFacade;
@@ -24,6 +23,7 @@ public class InGameClient extends Client{
 
     public InGameClient(ServerFacade serverFacade, Repl repl, String authToken, int gameId,ChessGame.TeamColor teamColor) throws IOException {
         this.notificationHandler = new NotificationHandler(this);
+        this.serverFacade = serverFacade;
         this.wsFacade = new WsFacade(serverFacade.getServerUrl(), this,notificationHandler);
         this.repl = repl;
         this.authToken = authToken;
@@ -124,10 +124,16 @@ public class InGameClient extends Client{
                     return helpString();
                 }
                 case("redraw") -> {
-                    return "";
+                    return chessBoard(teamColor);
                 }
                 case("leave") -> {
-                    //TODO: Do something
+                    UserGameCommand userGameCommand = new UserGameCommand(
+                            UserGameCommand.CommandType.LEAVE,
+                            authToken,
+                            gameId,
+                            teamColor
+                    );
+                    wsFacade.send(userGameCommand);
                     return enterPostLoginUi(authToken);
                 }
                 case("move") -> {
