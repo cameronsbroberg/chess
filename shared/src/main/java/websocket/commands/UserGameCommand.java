@@ -1,8 +1,5 @@
 package websocket.commands;
 
-import chess.ChessGame;
-import chess.ChessMove;
-
 import java.util.Objects;
 
 /**
@@ -19,23 +16,10 @@ public class UserGameCommand {
 
     private final Integer gameID;
 
-    private ChessGame.TeamColor teamColor = null;
-
-    private ChessMove chessMove = null;
-
-    public UserGameCommand(CommandType commandType, String authToken, Integer gameID, ChessGame.TeamColor teamColor) {
+    public UserGameCommand(CommandType commandType, String authToken, Integer gameID) {
         this.commandType = commandType;
         this.authToken = authToken;
         this.gameID = gameID;
-        this.teamColor = teamColor;
-    }
-
-    public UserGameCommand(CommandType commandType, String authToken, Integer gameID, ChessGame.TeamColor teamColor, ChessMove chessMove) {
-        this.commandType = commandType;
-        this.authToken = authToken;
-        this.gameID = gameID;
-        this.teamColor = teamColor;
-        this.chessMove = chessMove;
     }
 
     public enum CommandType {
@@ -55,14 +39,6 @@ public class UserGameCommand {
 
     public Integer getGameID() {
         return gameID;
-    }
-
-    public ChessGame.TeamColor getTeamColor() {
-        return teamColor;
-    }
-
-    public ChessMove getChessMove() {
-        return chessMove;
     }
 
     @Override
