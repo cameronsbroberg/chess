@@ -140,29 +140,15 @@ public class PostLoginClient extends Client {
                     return "Joined successfully" + "\n" + enterInGameUi(gameId,teamColor);
                 }
                 case ("observe") -> {
-                    int gameId;
-                    try {
-                        gameId = listedGames.get(Integer.parseInt(tokens[1]));
-                        return "Observing game\n" + enterInGameUi(gameId,null);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e); //FIXME do something better than this
-                    }
+                    int gameId = listedGames.get(Integer.parseInt(tokens[1]));
+                    return "Observing game\n" + enterInGameUi(gameId,null);
                 }
                 default -> {
                     return "Unknown command. Try 'help' for options";
                 }
             }
-        } catch (IndexOutOfBoundsException e) {
-            return "Not enough arguments. Try the command again";
-        }
-        catch (ResponseException e) {
-            return e.getMessage();
-        }
-        catch (NullPointerException e){
-            return "Bad ID. Please try again";
-        }
-        catch (Exception e) {
-            return "Unknown error. Please try again";
+        } catch (Exception e) {
+            return handleException(e);
         }
     }
     private String enterPreLoginUi(){

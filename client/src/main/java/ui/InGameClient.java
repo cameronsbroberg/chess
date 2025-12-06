@@ -102,7 +102,7 @@ public class InGameClient extends Client{
 
     public void updateGame(ChessGame newGame){
         this.chessGame = newGame;
-        System.out.println(chessBoard(this.teamColor));
+        System.out.println(chessBoard(null,this.teamColor,chessGame));
         System.out.println("Type a command");
     }
 
@@ -153,51 +153,6 @@ public class InGameClient extends Client{
         return new ChessPosition(row,col);
     }
 
-    private String highlightBoard(ChessPosition highlightPiece, ChessGame.TeamColor teamColor){
-        if (chessGame.validMoves(highlightPiece) == null){
-            return chessBoard(teamColor) + "No piece at selected square";
-        }
-        Collection<ChessMove> validMoves = chessGame.validMoves(highlightPiece);
-        Collection<ChessPosition> highlightSpots = new ArrayList<>();
-        for(ChessMove move : validMoves){
-            highlightSpots.add(move.getEndPosition());
-        }
-
-        if(teamColor == null){
-            teamColor = ChessGame.TeamColor.WHITE; //Show white side if observer
-        }
-        String boardString = "";
-        boardString += horizontalBorder(teamColor);
-        int row_start = (teamColor == ChessGame.TeamColor.WHITE ? 8 : 1);
-        int row_end = (teamColor == ChessGame.TeamColor.WHITE ? 1 : 8);
-
-        int row_inc = (teamColor == ChessGame.TeamColor.WHITE ? -1 : 1);
-
-        int col_start = (teamColor == ChessGame.TeamColor.WHITE ? 1 : 8);
-        int col_end = (teamColor == ChessGame.TeamColor.WHITE ? 8 : 1);
-
-        int col_inc = (teamColor == ChessGame.TeamColor.WHITE ? 1 : -1);
-
-        for(int i = row_start; (row_inc < 0 ? i >= row_end : i <= row_end); i = i + row_inc){ //i is the row
-            boardString += SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + i + " ";
-            for (int j = col_start; (col_inc < 0 ? j >= col_end : j <= col_end); j = j + col_inc) { //j is the column
-                String background = ((i + j) % 2 == 0 ? SET_BG_COLOR_DARK_GREEN : SET_BG_COLOR_LIGHT_GREY);
-                ChessPosition here = new ChessPosition(i,j);
-                if(here.equals(highlightPiece)){
-                    background = SET_BG_COLOR_DARK_YELLOW;
-                }
-                else if(highlightSpots.contains(here)){
-                    background = ((i + j) % 2 == 0 ? SET_BG_COLOR_DARK_BLUE : SET_BG_COLOR_MEDIUM_BLUE);
-                }
-                boardString += background + " " + whichPiece(i,j) + " ";
-            }
-            boardString += SET_BG_COLOR_WHITE + SET_TEXT_COLOR_BLACK + " " + i;
-            boardString += SET_BG_COLOR_WHITE + "\n";
-        }
-        boardString += horizontalBorder(teamColor);
-        return boardString;
-    }
-
     @Override
     String eval(String input) {
         try{
@@ -211,7 +166,7 @@ public class InGameClient extends Client{
                     return helpString();
                 }
                 case("redraw") -> {
-                    return chessBoard(teamColor);
+                    return chessBoard(null, teamColor, chessGame);
                 }
                 case("leave") -> {
                     UserGameCommand userGameCommand = new UserGameCommand(
@@ -258,20 +213,14 @@ public class InGameClient extends Client{
                 }
                 case("highlight") -> {
                     ChessPosition piecePosition = parsePosition(tokens[1]);
-                    return highlightBoard(piecePosition,teamColor);
+                    return chessBoard(piecePosition,teamColor,chessGame);
                 }
                 default -> {
                     return "Unknown command. Try 'help' for options";
                 }
             }
-        } catch (IndexOutOfBoundsException e) {
-            return "Not enough arguments. Try the command again";
-        }
-        catch (ResponseException e) {
-            return e.getMessage();
-        }
-        catch (Exception e) {
-            return "Unknown error. Please try again";
+        } catch (Exception e) {
+            return handleException(e);
         }
     }
     private String enterPostLoginUi(String authToken){

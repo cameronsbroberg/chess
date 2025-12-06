@@ -16,10 +16,7 @@ public class ConnectionManager {
     public void remove(int gameId, Session session){
 
         Set<Session> existingSet = connections.get(gameId);
-        if(existingSet == null){
-            return; //TODO: Throw an error?
-        }
-        else{
+        if(existingSet != null){
             connections.get(gameId).remove(session);
         }
     }

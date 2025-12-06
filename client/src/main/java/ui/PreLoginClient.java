@@ -49,14 +49,8 @@ public class PreLoginClient extends Client {
                     return "Unknown command. Try 'help' for options";
                 }
             }
-        } catch (IndexOutOfBoundsException e) {
-            return "Not enough arguments. Try the command again";
-        }
-        catch (ResponseException e) {
-            return e.getMessage();
-        }
-        catch (Exception e) {
-            return "Unknown error. Please try again";
+        } catch (Exception e) {
+            return handleException(e);
         }
     }
     private String enterPostLoginUi(String authToken){
