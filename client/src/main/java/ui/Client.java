@@ -96,4 +96,9 @@ public abstract class Client {
             }
         }
     }
+    protected String enterPostLoginUi(String authToken){
+        Client client = new PostLoginClient(serverFacade,repl,authToken);
+        repl.setClient(client);
+        return client.helpString();
+    }
 }

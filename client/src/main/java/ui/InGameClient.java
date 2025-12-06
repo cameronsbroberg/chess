@@ -223,9 +223,4 @@ public class InGameClient extends Client{
             return handleException(e);
         }
     }
-    private String enterPostLoginUi(String authToken){
-        Client client = new PostLoginClient(serverFacade,repl,authToken);
-        repl.setClient(client);
-        return client.helpString();
-    }
 }
