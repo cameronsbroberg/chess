@@ -166,7 +166,7 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
                 connectionManager.broadcast(null, command.getGameID(),gameOver);
             } else if (game.isInCheck(otherPlayer)) {
                 String check = serializer.toJson(new Notification("Check!"));
-                connectionManager.broadcast(ctx.session, command.getGameID(),check);
+                connectionManager.broadcast(null, command.getGameID(),check);
             }
         } catch (Exception e) {
             ctx.send(serializer.toJson(new ErrorMessage("Error: " + e.getMessage())));
