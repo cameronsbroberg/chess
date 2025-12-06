@@ -70,7 +70,6 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
             ctx.send(loadGameJson);
 
             ChessGame.TeamColor teamColor = getTeamColor(command);
-//            ChessGame.TeamColor teamColor = command.getTeamColor();
             String asWhat;
             switch(teamColor){
                 case WHITE -> {
@@ -115,7 +114,6 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
             String blackUser = gameData.blackUsername();
             String gameName = gameData.gameName();
             ChessGame game = gameData.game();
-//            if(finishedGameIds.contains(gameData.gameId())){
             if(!game.isActive()){
                 String error = serializer.toJson(new ErrorMessage(
                         "Game is over. No moves allowed."
@@ -160,13 +158,11 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
                 String gameOver = serializer.toJson(new Notification(
                         username + " won by checkmate. Game over."
                 ));
-//                finishedGameIds.add(gameData.gameId());
                 connectionManager.broadcast(null, command.getGameID(),gameOver);
             } else if (game.isInStalemate(otherPlayer)) {
                 String gameOver = serializer.toJson(new Notification(
                         "Game ended by stalemate. Game over."
                 ));
-//                finishedGameIds.add(gameData.gameId());
                 connectionManager.broadcast(null, command.getGameID(),gameOver);
             } else if (game.isInCheck(otherPlayer)) {
                 String check = serializer.toJson(new Notification("Check!"));
