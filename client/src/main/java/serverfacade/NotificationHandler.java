@@ -15,7 +15,7 @@ public class NotificationHandler {
             case LoadGameMessage loadGameMessage -> client.updateGame(((LoadGameMessage) serverMessage).getGame());
             case ErrorMessage errorMessage -> System.out.println("Error: " + ((ErrorMessage) serverMessage).getErrorMessage());
             case Notification notification -> System.out.println(((Notification) serverMessage).getMessage());
-            default -> System.out.println("The server has gone mad and sent an impossible message.");
+            default -> System.out.println("The server has gone mad and sent an impossible message." + serverMessage.getServerMessageType());
         }
     }
 }

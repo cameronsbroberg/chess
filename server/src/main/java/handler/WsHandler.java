@@ -21,7 +21,6 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
     private final GameDAO gameDAO;
     private final AuthDAO authDAO;
     private final ConnectionManager connectionManager;
-//    private Collection<Integer> finishedGameIds = new HashSet<>();
 
     public WsHandler(GameDAO gameDAO, AuthDAO authDAO) {
         super();
@@ -51,9 +50,6 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
 
     @Override
     public void handleMessage(@NotNull WsMessageContext ctx) {
-        if(ctx.message() == "CLEAR"){
-            clear();
-        }
         UserGameCommand command = serializer.fromJson(ctx.message(), UserGameCommand.class);
         switch(command.getCommandType()){
             case CONNECT -> connect(ctx, serializer.fromJson(ctx.message(), ConnectCommand.class));
@@ -244,7 +240,6 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
 
     public void clear(){
         connectionManager.clear();
-//        finishedGameIds.clear();
     }
 
     private String parsePosition(ChessPosition position){
@@ -260,7 +255,7 @@ public class WsHandler extends Handler implements WsConnectHandler, WsMessageHan
             case(7) -> col = "g";
             case(8) -> col = "h";
         }
-        return row + col;
+        return col + row;
     }
     @Override
     public void handleClose(@NotNull WsCloseContext ctx) throws Exception {

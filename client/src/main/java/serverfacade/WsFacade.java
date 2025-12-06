@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import jakarta.websocket.*;
 import ui.InGameClient;
 import websocket.commands.UserGameCommand;
-import websocket.messages.ServerMessage;
+import websocket.messages.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -29,8 +29,21 @@ public class WsFacade extends Endpoint {
                 @Override
                 public void onMessage(String message) {
                     ServerMessage serverMessage = serializer.fromJson(message,ServerMessage.class);
-                    notificationHandler.handleNotification(serverMessage);
-                }
+                    switch(serverMessage.getServerMessageType()){
+                        case ServerMessage.ServerMessageType.LOAD_GAME -> {
+                            LoadGameMessage loadGameMessage = serializer.fromJson(message, LoadGameMessage.class);
+                            notificationHandler.handleNotification(loadGameMessage);
+                        }
+                        case ServerMessage.ServerMessageType.ERROR -> {
+                            ErrorMessage errorMessage = serializer.fromJson(message, ErrorMessage.class);
+                            notificationHandler.handleNotification(errorMessage);
+                        }
+                        case ServerMessage.ServerMessageType.NOTIFICATION -> {
+                            Notification notification = serializer.fromJson(message, Notification.class);
+                            notificationHandler.handleNotification(notification);
+                        }
+                        default -> System.out.println("I'm going insane " + serverMessage.getServerMessageType());
+                    }}
             });
         } catch (URISyntaxException | DeploymentException | IOException e) {
             throw new ResponseException("500:" + e.getMessage());
@@ -40,14 +53,6 @@ public class WsFacade extends Endpoint {
     public void send(UserGameCommand command) throws IOException {
         String message = serializer.toJson(command);
         session.getBasicRemote().sendText(message);
-    }
-
-    public void clear(){
-        try {
-            session.getBasicRemote().sendText("CLEAR");
-        } catch (IOException e) {
-            //Oh well, you tried
-        }
     }
 
     @Override

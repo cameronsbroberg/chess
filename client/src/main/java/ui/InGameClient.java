@@ -179,7 +179,7 @@ public class InGameClient extends Client{
                 }
                 case("move") -> {
                     if(teamColor == null){
-                        return "Unknown command. Try 'help' for options";
+                        return "Observers cannot move. Try 'help' for options";
                     }
                     ChessMove chessMove = null;
                     try {
@@ -197,7 +197,7 @@ public class InGameClient extends Client{
                 }
                 case("resign") -> {
                     if(teamColor == null){
-                        return "Unknown command. Try 'help' for options";
+                        return "Observers cannot resign. Try 'help' for options";
                     }
                     if(!promptedResign){
                         promptedResign = true;
